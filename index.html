@@ -1,0 +1,307 @@
+
+
+
+<html>
+    <head>
+        <title>Research a Car</title>
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+
+        <link rel="stylesheet" href="/static/CACHE/css/116ad20b99ab.css" type="text/css" />
+        <style>
+        /* line 1, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        body {
+          padding-top: 5em; }
+
+        /* line 6, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #filterPanel .panel-group {
+          margin-bottom: 5px; }
+          /* line 8, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+          #filterPanel .panel-group .slider-input {
+            border: 0;
+            box-shadow: none;
+            padding: 0; }
+            /* line 12, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+            #filterPanel .panel-group .slider-input.highest-readonly {
+              text-align: right; }
+
+        /* line 22, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #thumb-placeholder a .thumbnail .thumbnail-pic {
+          width: 252px;
+          display: block; }
+
+        /* line 26, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #thumb-placeholder a .thumbnail .thumbnail-yearmake {
+          margin: 0;
+          color: #777777; }
+
+        /* line 30, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #thumb-placeholder a .thumbnail .thumbnail-model {
+          font-size: 18px; }
+
+        /* line 33, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #thumb-placeholder a .thumbnail .thumbnail-msrp {
+          color: #777777; }
+
+        /* line 38, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #thumb-placeholder a:hover {
+          text-decoration: none; }
+
+        /* line 44, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        #veil {
+          background: #fff;
+          width: 100%;
+          height: 100%;
+          position: absolute;
+          z-index: 1;
+          opacity: 0.8; }
+
+        /* line 53, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .feature-list dt {
+          text-align: left;
+          margin-right: 1em; }
+
+        /* line 57, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .feature-list dd {
+          margin-left: 12rem; }
+
+        /* line 61, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .overview-h3 {
+          margin-top: 0; }
+
+        /* line 64, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .panel-heading {
+          padding: 0; }
+          /* line 66, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+          .panel-heading .accordion-btn {
+            display: block;
+            margin: 0;
+            padding: 10px 15px;
+            text-decoration: none; }
+            /* line 71, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+            .panel-heading .accordion-btn span {
+              float: right; }
+
+        /* line 77, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .car-list .thumbnail .caption .car-list__title {
+          height: 4rem; }
+
+        /* line 80, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .car-list .thumbnail .caption .car-list__feature {
+          margin-bottom: 0; }
+
+        /* line 84, /home/dmitrymar/carfilter/filterpages/static/filterpages/scss/_global.scss */
+        .overview-table .table-numbers {
+          white-space: nowrap; }
+
+        /*# sourceMappingURL=data:application/json;base64,eyJuYW1lcyI6IFtdLCAic291cmNlcyI6IFsiL3N0YXRpYy9maWx0ZXJwYWdlcy9zY3NzL2FwcC5zY3NzIiwgIi9zdGF0aWMvZmlsdGVycGFnZXMvc2Nzcy9fY3VzdG9tVmFyaWFibGVzLnNjc3MiLCAiL3N0YXRpYy9maWx0ZXJwYWdlcy9zY3NzL19nbG9iYWwuc2NzcyJdLCAibWFwcGluZ3MiOiAiO0FFQUEsQUFBQSxJQUFJLENBQUM7RUFDRCxXQUFXLEVBQUUsR0FBSSxHQUNwQjs7O0FBRUQsQUFDRSxZQURVLENBQ1YsWUFBWSxDQUFDO0VBQ1gsYUFBYSxFQUFFLEdBQUksR0FTcEI7O0VBWEgsQUFHSSxZQUhRLENBQ1YsWUFBWSxDQUVWLGFBQWEsQ0FBQztJQUNaLE1BQU0sRUFBRSxDQUFFO0lBQ1YsVUFBVSxFQUFDLElBQUs7SUFDaEIsT0FBTyxFQUFDLENBQUUsR0FJWDs7SUFWTCxBQUdJLFlBSFEsQ0FDVixZQUFZLENBRVYsYUFBYSxBQUlSLGlCQUFpQixDQUFDO01BQ2pCLFVBQVUsRUFBQyxLQUFNLEdBQ2xCOzs7QUFLVCxBQUdNLGtCQUhZLENBQ2hCLENBQUMsQ0FDQyxVQUFVLENBQ1IsY0FBYyxDQUFDO0VBQ2IsS0FBSyxFQUFFLEtBQU07RUFDYixPQUFPLEVBQUUsS0FBTSxHQUNoQjs7O0FBTlAsQUFPTSxrQkFQWSxDQUNoQixDQUFDLENBQ0MsVUFBVSxDQUtSLG1CQUFtQixDQUFDO0VBQ2xCLE1BQU0sRUFBRSxDQUFFO0VBQ1YsS0FBSyxFRGJZLE9BQU8sR0NjekI7OztBQVZQLEFBV00sa0JBWFksQ0FDaEIsQ0FBQyxDQUNDLFVBQVUsQ0FTUixnQkFBZ0IsQ0FBQztFQUNmLFNBQVMsRURzQlMsSUFBSSxHQ3JCdkI7OztBQWJQLEFBY00sa0JBZFksQ0FDaEIsQ0FBQyxDQUNDLFVBQVUsQ0FZUixlQUFlLENBQUM7RUFDZCxLQUFLLEVEbkJZLE9BQU8sR0NvQnpCOzs7QUFoQlAsQUFDRSxrQkFEZ0IsQ0FDaEIsQ0FBQyxBQWtCRSxNQUFNLENBQUM7RUFDTixlQUFlLEVBQUUsSUFBSyxHQUN2Qjs7O0FBSUwsQUFBQSxLQUFLLENBQUM7RUFDSixVQUFVLEVBQUUsSUFBSztFQUNqQixLQUFLLEVBQUMsSUFBSztFQUNYLE1BQU0sRUFBQyxJQUFLO0VBQ1osUUFBUSxFQUFDLFFBQVM7RUFDbEIsT0FBTyxFQUFDLENBQUU7RUFDVixPQUFPLEVBQUMsR0FBSSxHQUNiOzs7QUFDRCxBQUNJLGFBRFMsQ0FDVCxFQUFFLENBQUM7RUFDQyxVQUFVLEVBQUUsSUFBSztFQUNqQixZQUFZLEVBQUUsR0FBSSxHQUNyQjs7O0FBSkwsQUFLQyxhQUxZLENBS1osRUFBRSxDQUFDO0VBQ0YsV0FBVyxFQUFFLEtBQU0sR0FDbkI7OztBQUVGLEFBQUEsWUFBWSxDQUFDO0VBQ1osVUFBVSxFQUFFLENBQUUsR0FDZDs7O0FBQ0QsQUFBQSxjQUFjLENBQUM7RUFDZCxPQUFPLEVBQUUsQ0FBRSxHQVVYOztFQVhELEFBRUMsY0FGYSxDQUViLGNBQWMsQ0FBQztJQUNkLE9BQU8sRUFBRSxLQUFNO0lBQ2YsTUFBTSxFQUFFLENBQUU7SUFDVixPQUFPLEVBQUUsU0FBVTtJQUNuQixlQUFlLEVBQUUsSUFBSyxHQUl0Qjs7SUFWRixBQU9FLGNBUFksQ0FFYixjQUFjLENBS2IsSUFBSSxDQUFDO01BQ0osS0FBSyxFQUFFLEtBQU0sR0FDYjs7O0FBR0gsQUFDQyxTQURRLENBQUMsVUFBVSxDQUFDLFFBQVEsQ0FDNUIsZ0JBQWdCLENBQUM7RUFDaEIsTUFBTSxFQUFFLElBQUssR0FDYjs7O0FBSEYsQUFJQyxTQUpRLENBQUMsVUFBVSxDQUFDLFFBQVEsQ0FJNUIsa0JBQWtCLENBQUM7RUFDbEIsYUFBYSxFQUFFLENBQUUsR0FDakI7OztBQUVGLEFBQWdCLGVBQUQsQ0FBQyxjQUFjLENBQUM7RUFDOUIsV0FBVyxFQUFFLE1BQU8sR0FDcEIiLCAidmVyc2lvbiI6IDMsICJmaWxlIjogImFwcC5jc3MifQ==  */
+
+        </style>
+
+
+
+
+
+
+    </head>
+    <body>
+        <nav id="headerNav" class="navbar navbar-default navbar-fixed-top">
+              <div class="container">
+                <!-- Brand and toggle get grouped for better mobile display -->
+                <div class="navbar-header">
+                  <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                  </button>
+                  <a class="navbar-brand" href="/">Car Filter</a>
+                </div>
+
+              </div><!-- /.container -->
+            </nav>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3" id="filterPanel">
+
+                <div class="panel-group" id="accordion">
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="accordion-btn">
+                                    Body Type<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="bodyType" data-id="1000" class="toggle" value="hatchback">
+                                    Hatchback
+                                  </label>
+                                </div>
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="bodyType" data-id="1001" class="toggle" value="sedan">
+                                    Sedan
+                                  </label>
+                                </div>
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="bodyType" data-id="1002" class="toggle" value="suv">
+                                    SUV
+                                  </label>
+                                </div>
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="bodyType" data-id="1003" class="toggle" value="wagon">
+                                    Wagon
+                                  </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="accordion-btn">
+                                    Drivetrain<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse in">
+                            <div class="panel-body">
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="driveTrain" data-id="1008" class="toggle" value="front wheel drive">
+                                    Front-Wheel Drive
+                                  </label>
+                                </div>
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="driveTrain" data-id="1009" class="toggle" value="rear wheel drive">
+                                    Rear-Wheel Drive
+                                  </label>
+                                </div>
+                                <div class="checkbox ">
+                                  <label>
+                                    <input type="checkbox" name="driveTrain" data-id="1007" class="toggle" value="all wheel drive">
+                                    All-Wheel Drive
+                                  </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="col-md-9">
+                <div class="row">
+
+
+                            <div class="col-sm-6 col-md-4">
+                            <a href="/overview/2016/fiat/500e/hatchback/">
+                                <div class="thumbnail">
+                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/fiat/500e/2016/oem/2016_fiat_500e_2dr-hatchback_base_fq_oem_1_276.jpg">
+                                  <div class="caption">
+                                    <p class="thumbnail-yearmake">2016 FIAT</p>
+                                    <p class="thumbnail-model">500e </p>
+                                    <p>87 miles range</p>
+                                    <p>
+                                      <span class="thumbnail-msrp">Starting at</span> $31,800
+                                      <span class="thumbnail-msrp">MSRP</span>
+                                    </p>
+                                  </div>
+                                </div>
+                              </a>
+                            </div>
+
+
+
+
+
+                            <div class="col-sm-6 col-md-4">
+                            <a href="/overview/2016/nissan/leaf/hatchback/30kwh">
+                                <div class="thumbnail">
+                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/nissan/leaf/2016/oem/2016_nissan_leaf_4dr-hatchback_sl_fq_oem_4_276.jpg">
+                                  <div class="caption">
+                                    <p class="thumbnail-yearmake">2016 Nissan</p>
+                                    <p class="thumbnail-model">Leaf 30kWh</p>
+                                    <p>107 miles range</p>
+                                    <p>
+                                      <span class="thumbnail-msrp">Starting at</span> $34,200
+                                      <span class="thumbnail-msrp">MSRP</span>
+                                    </p>
+                                  </div>
+                                </div>
+                              </a>
+                            </div>
+
+
+
+                            <div class="col-sm-6 col-md-4">
+                            <a href="/overview/2016/mercedes-benz/b250e/hatchback/">
+                                <div class="thumbnail">
+                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/mercedes-benz/b-class-electric-drive/2016/oem/2016_mercedes-benz_b-class-electric-drive_4dr-hatchback_b250e_fq_oem_1_276.jpg">
+                                  <div class="caption">
+                                    <p class="thumbnail-yearmake">2016 Mercedes-Benz</p>
+                                    <p class="thumbnail-model">B250e </p>
+                                    <p>87 miles range</p>
+                                    <p>
+                                      <span class="thumbnail-msrp">Starting at</span> $41,450
+                                      <span class="thumbnail-msrp">MSRP</span>
+                                    </p>
+                                  </div>
+                                </div>
+                              </a>
+                            </div>
+
+
+
+                            <div class="col-sm-6 col-md-4">
+                            <a href="/overview/2016/mitsubishi/i-miev/hatchback/">
+                                <div class="thumbnail">
+                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/mitsubishi/i-miev/2012/oem/2012_mitsubishi_i-miev_4dr-hatchback_es_fq_oem_6_276.jpg">
+                                  <div class="caption">
+                                    <p class="thumbnail-yearmake">2016 Mitsubishi</p>
+                                    <p class="thumbnail-model">i-MiEV </p>
+                                    <p>62 miles range</p>
+                                    <p>
+                                      <span class="thumbnail-msrp">Starting at</span> $22,995
+                                      <span class="thumbnail-msrp">MSRP</span>
+                                    </p>
+                                  </div>
+                                </div>
+                              </a>
+                            </div>
+
+
+
+                            <div class="col-sm-6 col-md-4">
+                            <a href="/overview/2016/tesla/model-s/sedan/70d">
+                                <div class="thumbnail">
+                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/tesla/model-s/2016/oem/2016_tesla_model-s_sedan_p90d_fq_oem_2_276.jpg">
+                                  <div class="caption">
+                                    <p class="thumbnail-yearmake">2016 Tesla</p>
+                                    <p class="thumbnail-model">Model S 70D</p>
+                                    <p>240 miles range</p>
+                                    <p>
+                                      <span class="thumbnail-msrp">Starting at</span> $75,000
+                                      <span class="thumbnail-msrp">MSRP</span>
+                                    </p>
+                                  </div>
+                                </div>
+                              </a>
+                            </div>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    </body>
+</html>
