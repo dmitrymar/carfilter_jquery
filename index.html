@@ -7,6 +7,8 @@
         <link rel="stylesheet" href="main.css" type="text/css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="data.js" async></script>
+        <script src="main.js" async></script>
     </head>
     <body>
         <nav id="headerNav" class="navbar navbar-default navbar-fixed-top">
@@ -39,26 +41,7 @@
                             </h4>
                         </div>
                         <div id="collapseTwo" class="panel-collapse collapse in">
-                            <div class="panel-body">
-                                <div class="checkbox ">
-                                  <label>
-                                    <input type="checkbox" name="bodyType" data-id="1000" class="toggle" value="hatchback">
-                                    Hatchback
-                                  </label>
-                                </div>
-                                <div class="checkbox ">
-                                  <label>
-                                    <input type="checkbox" name="bodyType" data-id="1001" class="toggle" value="sedan">
-                                    Sedan
-                                  </label>
-                                </div>
-                                <div class="checkbox ">
-                                  <label>
-                                    <input type="checkbox" name="bodyType" data-id="1002" class="toggle" value="suv">
-                                    SUV
-                                  </label>
-                                </div>
-                            </div>
+                            <div class="panel-body" id="body-types-container"></div>
                         </div>
                     </div>
                     <div class="panel panel-default">
@@ -70,149 +53,14 @@
                             </h4>
                         </div>
                         <div id="collapseThree" class="panel-collapse collapse in">
-                            <div class="panel-body">
-                                <div class="checkbox ">
-                                  <label>
-                                    <input type="checkbox" name="driveTrain" data-id="1008" class="toggle" value="front wheel drive">
-                                    Front-Wheel Drive
-                                  </label>
-                                </div>
-                                <div class="checkbox ">
-                                  <label>
-                                    <input type="checkbox" name="driveTrain" data-id="1009" class="toggle" value="rear wheel drive">
-                                    Rear-Wheel Drive
-                                  </label>
-                                </div>
-                                <div class="checkbox ">
-                                  <label>
-                                    <input type="checkbox" name="driveTrain" data-id="1007" class="toggle" value="all wheel drive">
-                                    All-Wheel Drive
-                                  </label>
-                                </div>
-                            </div>
+                            <div class="panel-body" id="drive-types-container"></div>
                         </div>
                     </div>
                 </div>
 
             </div>
             <div class="col-md-9">
-                <div class="row">
-
-<!-- Hatchback Front Wheel Drive -->
-                            <div class="col-sm-6 col-md-4">
-                            <a href="http://www.fiatusa.com/en/500e/">
-                                <div class="thumbnail">
-                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/fiat/500e/2016/oem/2016_fiat_500e_2dr-hatchback_base_fq_oem_1_276.jpg">
-                                  <div class="caption">
-                                    <p class="thumbnail-yearmake">2016 FIAT</p>
-                                    <p class="thumbnail-model">500e </p>
-                                    <p>87 miles range</p>
-                                    <p>
-                                      <span class="thumbnail-msrp">Starting at</span> $31,800
-                                      <span class="thumbnail-msrp">MSRP</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-
-
-
-<!-- Hatchback Front Wheel Drive -->
-                            <div class="col-sm-6 col-md-4">
-                            <a href="http://www.nissanusa.com/Leaf">
-                                <div class="thumbnail">
-                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/nissan/leaf/2016/oem/2016_nissan_leaf_4dr-hatchback_sl_fq_oem_4_276.jpg">
-                                  <div class="caption">
-                                    <p class="thumbnail-yearmake">2016 Nissan</p>
-                                    <p class="thumbnail-model">Leaf 30kWh</p>
-                                    <p>107 miles range</p>
-                                    <p>
-                                      <span class="thumbnail-msrp">Starting at</span> $34,200
-                                      <span class="thumbnail-msrp">MSRP</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-
-<!-- Hatchback Front Wheel Drive -->
-                            <div class="col-sm-6 col-md-4">
-                            <a href="https://www.mbusa.com/mercedes/vehicles/model/class-B/model-B250E">
-                                <div class="thumbnail">
-                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/mercedes-benz/b-class-electric-drive/2016/oem/2016_mercedes-benz_b-class-electric-drive_4dr-hatchback_b250e_fq_oem_1_276.jpg">
-                                  <div class="caption">
-                                    <p class="thumbnail-yearmake">2016 Mercedes-Benz</p>
-                                    <p class="thumbnail-model">B250e </p>
-                                    <p>87 miles range</p>
-                                    <p>
-                                      <span class="thumbnail-msrp">Starting at</span> $41,450
-                                      <span class="thumbnail-msrp">MSRP</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-
-<!-- Hatchback Rear Wheel Drive -->
-                            <div class="col-sm-6 col-md-4">
-                            <a href="http://www.mitsubishicars.com/imiev">
-                                <div class="thumbnail">
-                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/mitsubishi/i-miev/2012/oem/2012_mitsubishi_i-miev_4dr-hatchback_es_fq_oem_6_276.jpg">
-                                  <div class="caption">
-                                    <p class="thumbnail-yearmake">2016 Mitsubishi</p>
-                                    <p class="thumbnail-model">i-MiEV </p>
-                                    <p>62 miles range</p>
-                                    <p>
-                                      <span class="thumbnail-msrp">Starting at</span> $22,995
-                                      <span class="thumbnail-msrp">MSRP</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-
-<!-- sedan all wheel drive -->
-                            <div class="col-sm-6 col-md-4">
-                            <a href="https://www.teslamotors.com/models">
-                                <div class="thumbnail">
-                                  <img class="thumbnail-pic" src="http://media.ed.edmunds-media.com/tesla/model-s/2016/oem/2016_tesla_model-s_sedan_p90d_fq_oem_2_276.jpg">
-                                  <div class="caption">
-                                    <p class="thumbnail-yearmake">2016 Tesla</p>
-                                    <p class="thumbnail-model">Model S 70D</p>
-                                    <p>240 miles range</p>
-                                    <p>
-                                      <span class="thumbnail-msrp">Starting at</span> $75,000
-                                      <span class="thumbnail-msrp">MSRP</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-
-                            <div class="col-sm-6 col-md-4">
-                            <a href="https://www.teslamotors.com/modelx">
-                                <div class="thumbnail">
-                                  <img class="thumbnail-pic" src="https://media.ed.edmunds-media.com/tesla/model-x/2016/oem/2016_tesla_model-x_4dr-suv_p90d_fq_oem_1_276.jpg">
-                                  <div class="caption">
-                                    <p class="thumbnail-yearmake">2016 Tesla</p>
-                                    <p class="thumbnail-model">Model X 75D</p>
-                                    <p>237 miles range</p>
-                                    <p>
-                                      <span class="thumbnail-msrp">Starting at</span> $83,000
-                                      <span class="thumbnail-msrp">MSRP</span>
-                                    </p>
-                                  </div>
-                                </div>
-                              </a>
-                            </div>
-
-                </div>
+                <div class="row" id="thumb-container"></div>
             </div>
         </div>
     </div>
