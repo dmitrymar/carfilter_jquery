@@ -39,75 +39,31 @@ var Template = {
     "use strict";
 
     var util = {
-		uuid: function () {
-			/*jshint bitwise:false */
-			var i, random;
-			var uuid = '';
-
-			for (i = 0; i < 32; i++) {
-				random = Math.random() * 16 | 0;
-				if (i === 8 || i === 12 || i === 16 || i === 20) {
-					uuid += '-';
-				}
-				uuid += (i === 12 ? 4 : (i === 16 ? (random & 3 | 8) : random)).toString(16);
-			}
-
-			return uuid;
-		},
-		pluralize: function (count, word) {
-			return count === 1 ? word : word + 's';
-		},
 		store: function (data) {
             var GARAGE = [];
 			if (arguments.length) {
                 // push in new data
 				GARAGE.push(data);
+                return GARAGE;
 			} else {
 
-                $.getJSON( "/data.json", function( data ) {
-                    console.log(data)
-                //   $.each( data, function( key, val ) {
-                //
-                //     // items.push( "<li id='" + key + "'>" + val + "</li>" );
-                //   });
-
+                var $xhr = $.getJSON("data.json");
+                $.when($xhr)
+                .done( function(data) {
+                    GARAGE = JSON.parse(JSON.stringify(data.models));
+                    //return GARAGE;
+                    console.log(GARAGE)
+                    return GARAGE
                 });
-                // $.ajax({
-                //   method: "GET",
-                //   url: "/data.js",
-                //   dataType: "json",
-                //   contentType: "application/json"
-                // });
 
-
-
-				// use default data from data.js
-                // var request = new XMLHttpRequest();
-                // var resp;
-                // request.open('GET', '/data.js', true);
-                //
-                // request.onload = function() {
-                //   if (this.status >= 200 && this.status < 400) {
-                //     // Success!
-                //     resp = this.responseText;
-                //
-                //     // GARAGE = JSON.parse(resp) ;
-                //     // console.log(GARAGE.models)
-                //   }
-                // };
-                //
-                // request.send();
-                //GARAGE = JSON.parse(JSON.stringify(CARS));
 			}
-            return GARAGE;
 		}
 	};
 
     var App = {
 		init: function () {
-            this.todos = util.store();
+            this.todos = this.store();
 			this.bindEvents();
-            this.render();
 		},
 		bindEvents: function () {
             $('#body-types-container')
@@ -117,8 +73,23 @@ var Template = {
             this.renderThumbs();
             this.renderTypes("body");
             this.renderTypes("drive");
-            util.store(this.todos);
+            this.store(this.todos);
+            console.log("fired")
         },
+        store: function (data) {
+			if (arguments.length) {
+                return [].push(data);
+			} else {
+                var $xhr = $.getJSON("data.json");
+                $.when($xhr)
+                .done( function(data) {
+                    this.todos = JSON.parse(JSON.stringify(data.models));
+                    this.renderThumbs();
+                    this.renderTypes("body");
+                    this.renderTypes("drive");
+                }.bind(this));
+			}
+		},
         toggle: function(e) {
             console.log("toggled")
             console.log(this)
