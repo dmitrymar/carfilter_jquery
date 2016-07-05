@@ -20,7 +20,7 @@ var Template = {
     displayBodyTypes: function(car) {
         return `<div class="checkbox">
                   <label>
-                    <input type="checkbox" name="bodyType" data-id="1000" class="toggle" value="${car.body}">
+                    <input type="checkbox" name="body" data-id="1000" class="toggle" value="${car.body}">
                     ${car.body}
                   </label>
                 </div>`
@@ -28,7 +28,7 @@ var Template = {
     displayDriveTypes: function(car) {
         return `<div class="checkbox">
                   <label>
-                    <input type="checkbox" name="driveTrain" data-id="1008" class="toggle" value="${car.drive}">
+                    <input type="checkbox" name="drive" data-id="1008" class="toggle" value="${car.drive}">
                     ${car.drive}
                   </label>
                 </div>`
@@ -39,65 +39,46 @@ var Template = {
     "use strict";
 
     var util = {
-		store: function (data) {
-            var GARAGE = [];
-			if (arguments.length) {
-                // push in new data
-				GARAGE.push(data);
-                return GARAGE;
-			} else {
 
-                var $xhr = $.getJSON("data.json");
-                $.when($xhr)
-                .done( function(data) {
-                    GARAGE = JSON.parse(JSON.stringify(data.models));
-                    //return GARAGE;
-                    console.log(GARAGE)
-                    return GARAGE
-                });
-
-			}
-		}
 	};
 
     var App = {
 		init: function () {
-            this.todos = this.store();
+            this.store();
 			this.bindEvents();
 		},
 		bindEvents: function () {
-            $('#body-types-container')
+            $('.types-container')
 				.on('change', '.toggle', this.toggle.bind(this))
 		},
         render: function() {
             this.renderThumbs();
             this.renderTypes("body");
             this.renderTypes("drive");
-            this.store(this.todos);
-            console.log("fired")
         },
         store: function (data) {
 			if (arguments.length) {
                 return [].push(data);
 			} else {
+                // load initial data
                 var $xhr = $.getJSON("data.json");
                 $.when($xhr)
                 .done( function(data) {
                     this.todos = JSON.parse(JSON.stringify(data.models));
-                    this.renderThumbs();
-                    this.renderTypes("body");
-                    this.renderTypes("drive");
+                    this.initialToDos = JSON.parse(JSON.stringify(data.models));
+                    this.render();
                 }.bind(this));
 			}
 		},
         toggle: function(e) {
-            console.log("toggled")
-            console.log(this)
-            this.todos.pop()
+            var name = $(e.target).attr("name")
+
+            for(var i = this.todos.length; i--;){
+                if (this.todos[i][name] !== $(e.target).val()) {
+                    this.todos.splice(i, 1);
+                }
+            }
             this.render();
-			// var i = this.indexFromEl(e.target);
-			// this.todos[i].completed = !this.todos[i].completed;
-			// this.render();
 		},
         renderTypes: function(prop) {
             var types = [];
