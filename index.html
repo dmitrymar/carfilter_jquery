@@ -7,6 +7,7 @@
         <link rel="stylesheet" href="main.css" type="text/css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="templates.js" async></script>
         <script src="main.js" async></script>
     </head>
     <body>
@@ -53,6 +54,31 @@
                         </div>
                         <div id="collapseThree" class="panel-collapse collapse in">
                             <div class="panel-body types-container" id="drive-types-container"></div>
+                        </div>
+                    </div>
+
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="accordion-btn">
+                                    Body Type<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseTwo" class="panel-collapse collapse in">
+                            <div class="panel-body types-container" id="body-container"></div>
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="accordion-btn">
+                                    Drivetrain<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                                </a>
+                            </h4>
+                        </div>
+                        <div id="collapseThree" class="panel-collapse collapse in">
+                            <div class="panel-body types-container" id="drive-container"></div>
                         </div>
                     </div>
                 </div>

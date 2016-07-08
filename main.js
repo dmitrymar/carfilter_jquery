@@ -1,49 +1,22 @@
-var Template = {
-    displayThumb: function(car) {
-        return `<div class="col-sm-6 col-md-4">
-                      <a href="${car.link}">
-                        <div class="thumbnail">
-                          <img class="thumbnail-pic" src="${car.imageURL}">
-                          <div class="caption">
-                            <p class="thumbnail-yearmake">${car.year} ${car.make}</p>
-                            <p class="thumbnail-model">${car.model} ${car.trim}</p>
-                            <p>${car.range} miles of range</p>
-                            <p>
-                              <span class="thumbnail-msrp">Starting at</span> $${car.price}
-                              <span class="thumbnail-msrp">MSRP</span>
-                            </p>
-                          </div>
-                        </div>
-                      </a>
-                    </div>`
-    },
-    displayBodyTypes: function(car) {
-        return `<div class="checkbox">
-                  <label>
-                    <input type="checkbox" name="body" data-id="1000" class="toggle" value="${car.body}">
-                    ${car.body}
-                  </label>
-                </div>`
-    },
-    displayDriveTypes: function(car) {
-        return `<div class="checkbox">
-                  <label>
-                    <input type="checkbox" name="drive" data-id="1008" class="toggle" value="${car.drive}">
-                    ${car.drive}
-                  </label>
-                </div>`
-    }
-};
-
-(function ($) {
+(function ($, Template) {
     "use strict";
-
-    var util = {
-
-	};
 
     var App = {
 		init: function () {
+            this.attributes =
+{
+    body: [
+        {attribute: "body", value: "Hatchback", checked: false, display: true},
+        {attribute: "body", value: "Sedan", checked: false, display: true},
+        {attribute: "body", value: "SUV", checked: false, display: true}
+    ],
+    drive: [
+        {attribute: "drive", value: "Front Wheel Drive", checked: false, display: true},
+        {attribute: "drive", value: "All Wheel Drive", checked: false, display: true},
+        {attribute: "drive", value: "Rear Wheel Drive", checked: false, display: true}
+    ]
+};
+            this.hierarchy = [];
             this.store();
 			this.bindEvents();
 		},
@@ -53,6 +26,7 @@ var Template = {
 		},
         render: function() {
             this.renderThumbs();
+            this.renderPanels();
             this.renderTypes("body");
             this.renderTypes("drive");
         },
@@ -64,36 +38,94 @@ var Template = {
                 var $xhr = $.getJSON("data.json");
                 $.when($xhr)
                 .done( function(data) {
-                    this.todos = JSON.parse(JSON.stringify(data.models));
-                    this.initialToDos = JSON.parse(JSON.stringify(data.models));
+                    // store all car model objects in immutable array. (The values here never change)
+                    this.allModels = JSON.parse(JSON.stringify(data.models));
+                    // store car models in mutable array. The values change depending on user selection
+                    this.models = JSON.parse(JSON.stringify(data.models));
                     this.render();
                 }.bind(this));
 			}
 		},
         toggle: function(e) {
-            var name = $(e.target).attr("name")
+            var name = $(e.target).attr("name"); // e.g. body or drive
+            var selectedValue = $(e.target).val(); // e.g. Hatchback
 
-            for(var i = this.todos.length; i--;){
-                if (this.todos[i][name] !== $(e.target).val()) {
-                    this.todos.splice(i, 1);
+            if (this.hierarchy.indexOf(name) === -1) {
+                this.hierarchy.push(name)
+            }
+            
+            console.log(this.hierarchy)
+
+            // for(var i = this.models.length; i--;){
+            //     console.log(this.models[i].drive)
+            //
+            //     if (this.models[i][name] === selectedValue) {
+            //         console.log(this.models[i][name])
+            //         this.models[i]["driveDisplay"] = true;
+            //     } else {
+            //         this.models[i]["driveDisplay"] = false;
+            //     }
+            // }
+            for (var i = this.models.length -1; i >= 0; i--) {
+                //console.log(this.models[i][name] === selectedValue)
+                if (this.models[i][name] === selectedValue) {
+                    //console.log(this.models[i]["drive"])
+                    this.models[i]["driveDisplay"] = true;
+                } else {
+                    this.models[i]["driveDisplay"] = false;
                 }
             }
+
+            // for(var i = this.models.length; i--;){
+            //
+            //     // if value selected doesn't equal to object value
+            //     if (this.models[i][name] !== $(e.target).val()) {
+            //         // remove that object
+            //         this.models.splice(i, 1);
+            //         this.selected.splice(i, 1);
+            //         console.log("case 1")
+            //     } else {
+            //         console.log("case 2")
+            //
+            //         this.selected.push({[name]: selectedValue});
+            //         this.models[i][name + "Checked"] = this.models[i][name + "Checked"] === "checked" ? "" : "checked";
+            //     }
+            // }
+            //console.log(this.models)
             this.render();
 		},
         renderTypes: function(prop) {
             var types = [];
-            var string = this.todos.map(function(car){
-                if (types.indexOf(car[prop]) === -1) {
-                    types.push(car[prop]);
-                    return prop === "drive" ? Template.displayDriveTypes(car) : Template.displayBodyTypes(car);
+            var string = this.models.map(function(car){
+                // if (types.indexOf(car[prop]) === -1) {
+                //     console.log('%cDisplay:','background: #FF6600;',car);
+                //     types.push(car[prop]);
+                //     return prop === "drive" ? Template.displayDriveTypes(car) : Template.displayBodyTypes(car);
+                // }
+                if (car.driveDisplay) {
+                    if (types.indexOf(car[prop]) === -1) {
+                        //console.log('%cDisplay:','background: #FF6600;',car);
+                        types.push(car[prop]);
+                        return prop === "drive" ? Template.displayDriveTypes(car) : Template.displayBodyTypes(car);
+                    }
                 }
             });
 
             $("#"+prop+"-types-container").html(string.join(''));
         },
+        renderPanels: function() {
+            for (var prop in this.attributes) {
+                var string = [];
+                string = this.attributes[prop].map(function(car){
+                    return Template.displayName(car)
+                });
+            //console.log(this.attributes[prop])
+                $("#"+prop+"-container").html(string.join(''));
+            }
+        },
 		renderThumbs: function () {
 
-            var carsString = this.todos.map(function(car){
+            var carsString = this.models.map(function(car){
                 return Template.displayThumb(car)
             });
 
@@ -102,4 +134,4 @@ var Template = {
 	};
 
 	App.init();
-}(window.jQuery));
+}(window.jQuery, Template));
