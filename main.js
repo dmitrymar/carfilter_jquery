@@ -1,3 +1,4 @@
+/* // do a reset function if all checkboxes are unchecked or entire one facet is checked */
 (function ($, Template) {
     "use strict";
 
@@ -16,19 +17,17 @@
         {attribute: "drive", value: "Rear Wheel Drive", checked: false, display: true}
     ]
 };
-            this.hierarchy = [];
+            this.levels = [];
             this.store();
 			this.bindEvents();
 		},
 		bindEvents: function () {
-            $('.types-container')
+            $('.facet')
 				.on('change', '.toggle', this.toggle.bind(this))
 		},
         render: function() {
             this.renderThumbs();
             this.renderPanels();
-            this.renderTypes("body");
-            this.renderTypes("drive");
         },
         store: function (data) {
 			if (arguments.length) {
@@ -47,71 +46,61 @@
 			}
 		},
         toggle: function(e) {
+            var checkbox = $(e.target).closest(".facet").find(".toggle");
             var name = $(e.target).attr("name"); // e.g. body or drive
             var selectedValue = $(e.target).val(); // e.g. Hatchback
+            var checked = $(e.target).is(":checked"); // true or false
+            this.filterData();
 
-            if (this.hierarchy.indexOf(name) === -1) {
-                this.hierarchy.push(name)
+
+            if (this.levels.indexOf(name) === -1) {
+                this.levels.push(name)
             }
-            
-            console.log(this.hierarchy)
+            console.log($(".toggle").is(":checked"))
 
-            // for(var i = this.models.length; i--;){
-            //     console.log(this.models[i].drive)
-            //
-            //     if (this.models[i][name] === selectedValue) {
-            //         console.log(this.models[i][name])
-            //         this.models[i]["driveDisplay"] = true;
-            //     } else {
-            //         this.models[i]["driveDisplay"] = false;
-            //     }
-            // }
-            for (var i = this.models.length -1; i >= 0; i--) {
-                //console.log(this.models[i][name] === selectedValue)
-                if (this.models[i][name] === selectedValue) {
-                    //console.log(this.models[i]["drive"])
-                    this.models[i]["driveDisplay"] = true;
-                } else {
-                    this.models[i]["driveDisplay"] = false;
+
+
+
+            // set attribute checked value to true or false
+            this.attributes[name].map(function(type) {
+                if (type.value === selectedValue) {
+                    type.checked = !type.checked;
+                    //console.log(type)
                 }
-            }
+            })
 
-            // for(var i = this.models.length; i--;){
-            //
-            //     // if value selected doesn't equal to object value
-            //     if (this.models[i][name] !== $(e.target).val()) {
-            //         // remove that object
-            //         this.models.splice(i, 1);
-            //         this.selected.splice(i, 1);
-            //         console.log("case 1")
-            //     } else {
-            //         console.log("case 2")
-            //
-            //         this.selected.push({[name]: selectedValue});
-            //         this.models[i][name + "Checked"] = this.models[i][name + "Checked"] === "checked" ? "" : "checked";
-            //     }
-            // }
-            //console.log(this.models)
-            this.render();
-		},
-        renderTypes: function(prop) {
-            var types = [];
-            var string = this.models.map(function(car){
-                // if (types.indexOf(car[prop]) === -1) {
-                //     console.log('%cDisplay:','background: #FF6600;',car);
-                //     types.push(car[prop]);
-                //     return prop === "drive" ? Template.displayDriveTypes(car) : Template.displayBodyTypes(car);
-                // }
-                if (car.driveDisplay) {
-                    if (types.indexOf(car[prop]) === -1) {
-                        //console.log('%cDisplay:','background: #FF6600;',car);
-                        types.push(car[prop]);
-                        return prop === "drive" ? Template.displayDriveTypes(car) : Template.displayBodyTypes(car);
+            //set model display value to true or false
+            this.models.map(function(car) {
+                // display all if all checboxes are unchecked
+                if (!$(".toggle").is(":checked")) {
+                    car.display = true;
+                } else {
+                    var previouslyChecked = $(checkbox).filter("[value='" + car[name] + "']").is(":checked");
+
+                    if (checked) {
+                        if (car[name] !== selectedValue) {
+                            // if display has previously been set to true then keep true
+                            car.display = previouslyChecked ? true : false;
+                        } else {
+                            car.display = true;
+                        }
+                    } else {
+                        //if checkbox is unchecked
+                        if (car[name] !== selectedValue) {
+                            car.display = previouslyChecked === false ? false : true;
+                        } else {
+                            car.display = false;
+                        }
                     }
                 }
-            });
+            }.bind(this))
+            //console.log(this.attributes[name])
 
-            $("#"+prop+"-types-container").html(string.join(''));
+            this.render();
+		},
+        filterData: function() {
+            // either make new ajax request or filter current data (this.models)
+            console.log("filteringing data");
         },
         renderPanels: function() {
             for (var prop in this.attributes) {
