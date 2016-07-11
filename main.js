@@ -17,6 +17,8 @@
         {attribute: "drive", value: "Rear Wheel Drive", checked: false, display: true}
     ]
 };
+            // Used to keep track of which filter is a proiority. Beginning elements in the array become a priority
+            // E.g. ["drive", "body"]
             this.levels = [];
             this.store();
 			this.bindEvents();
@@ -50,35 +52,36 @@
             var name = $(e.target).attr("name"); // e.g. body or drive
             var selectedValue = $(e.target).val(); // e.g. Hatchback
             var checked = $(e.target).is(":checked"); // true or false
-            this.filterData();
+            this.filterData({checkbox: checkbox, name: name, selectedValue: selectedValue, checked: checked});
+            this.render();
+		},
+        filterData: function(settings) {
+            // either make new ajax request or filter current data (this.models)
 
-
-            if (this.levels.indexOf(name) === -1) {
-                this.levels.push(name)
+            if (this.levels.indexOf(settings.name) === -1) {
+                this.levels.push(settings.name)
             }
-            console.log($(".toggle").is(":checked"))
-
-
-
 
             // set attribute checked value to true or false
-            this.attributes[name].map(function(type) {
-                if (type.value === selectedValue) {
+            this.attributes[settings.name].map(function(type) {
+                if (type.value === settings.selectedValue) {
                     type.checked = !type.checked;
-                    //console.log(type)
                 }
             })
+            var shownCars = [];
+
 
             //set model display value to true or false
             this.models.map(function(car) {
+
                 // display all if all checboxes are unchecked
                 if (!$(".toggle").is(":checked")) {
                     car.display = true;
                 } else {
-                    var previouslyChecked = $(checkbox).filter("[value='" + car[name] + "']").is(":checked");
+                    var previouslyChecked = $(settings.checkbox).filter("[value='" + car[settings.name] + "']").is(":checked");
 
-                    if (checked) {
-                        if (car[name] !== selectedValue) {
+                    if (settings.checked) {
+                        if (car[settings.name] !== settings.selectedValue) {
                             // if display has previously been set to true then keep true
                             car.display = previouslyChecked ? true : false;
                         } else {
@@ -86,21 +89,29 @@
                         }
                     } else {
                         //if checkbox is unchecked
-                        if (car[name] !== selectedValue) {
+                        if (car[settings.name] !== settings.selectedValue) {
                             car.display = previouslyChecked === false ? false : true;
                         } else {
                             car.display = false;
                         }
                     }
                 }
+                car.display ? shownCars.push(car.drive) : shownCars.push();
             }.bind(this))
-            //console.log(this.attributes[name])
+            console.log(shownCars)
 
-            this.render();
-		},
-        filterData: function() {
-            // either make new ajax request or filter current data (this.models)
-            console.log("filteringing data");
+            //filter facets
+            var attr = settings.name === "body" ? "drive" : "body";
+
+            this.attributes[attr].map(function(type) {
+                //console.log(settings.selectedValue)
+                // loop over and set display false
+                console.log(type.value + ' ' + (shownCars.indexOf(type.value) > -1))
+                if (shownCars.indexOf(type.value) === -1) {
+                    type.display = false;
+                }
+            })
+
         },
         renderPanels: function() {
             for (var prop in this.attributes) {
@@ -108,12 +119,11 @@
                 string = this.attributes[prop].map(function(car){
                     return Template.displayName(car)
                 });
-            //console.log(this.attributes[prop])
                 $("#"+prop+"-container").html(string.join(''));
             }
         },
 		renderThumbs: function () {
-
+            console.log(this.models);
             var carsString = this.models.map(function(car){
                 return Template.displayThumb(car)
             });
