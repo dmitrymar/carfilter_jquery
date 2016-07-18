@@ -16,17 +16,17 @@ var Template = {
                             </div>
                           </a>
                         </div>`
-        if (car.display) { return template }
+        return template
     },
     displayName: function(car) {
         var checked = car.checked ? "checked" : "";
         var template = `<div class="checkbox">
                           <label>
-                            <input type="checkbox" name="${car.attribute}" data-id="" class="toggle" value="${car.value}" ${checked}>
+                            <input type="checkbox" name="${car.attribute}" data-id="" class="toggle" value="${car.value}" ${car.checked}>
                             ${car.value}
                           </label>
                         </div>`
         //console.log(car.drive)
-        if (car.display) { return template }
+        return template
     }
 };

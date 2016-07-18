@@ -5,18 +5,26 @@
         <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
 
         <link rel="stylesheet" href="main.css" type="text/css" />
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
-        <script src="templates.js" async></script>
-        <!-- prevent caching -->
-        <script language="JavaScript">
-         var s=document.getElementsByTagName('script')[0];
-         var sc=document.createElement('script');
-         sc.type='text/javascript';
-         sc.async=true;
-         sc.src='main.js?v' + Math.random();
-         s.parentNode.insertBefore(sc,s);
+        <script>
+            // this code is to prevent browser from caching js files
+            var util = {
+                preventCache: function(url) {
+                    var s=document.getElementsByTagName('script')[0];
+                    var sc=document.createElement('script');
+                    sc.type='text/javascript';
+                    sc.async=true;
+                    sc.src=url+'?v' + Math.random();
+                    return s.parentNode.insertBefore(sc,s);
+                }
+            }
         </script>
+        <script src="jquery.mockjax.min.js" async></script>
+        <!-- <script language="JavaScript">util.preventCache("ajax-mocks.js")</script>  -->
+        <script language="JavaScript">util.preventCache("ajax-mocks.js")</script>
+        <script language="JavaScript">util.preventCache("templates.js")</script>
+        <script language="JavaScript">util.preventCache("main.js")</script>
     </head>
     <body>
         <nav id="headerNav" class="navbar navbar-default navbar-fixed-top">
@@ -38,34 +46,34 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3" id="filterPanel">
-
-                <div class="panel-group" id="accordion">
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="accordion-btn">
-                                    Body Type<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-                                </a>
-                            </h4>
+                <form id="filterForm">
+                    <div class="panel-group" id="accordion">
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="accordion-btn">
+                                        Body Type<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseTwo" class="panel-collapse collapse in">
+                                <div class="panel-body facet" id="body-container"></div>
+                            </div>
                         </div>
-                        <div id="collapseTwo" class="panel-collapse collapse in">
-                            <div class="panel-body facet" id="body-container"></div>
+                        <div class="panel panel-default">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="accordion-btn">
+                                        Drivetrain<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
+                                    </a>
+                                </h4>
+                            </div>
+                            <div id="collapseThree" class="panel-collapse collapse in">
+                                <div class="panel-body facet" id="drive-container"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="panel panel-default">
-                        <div class="panel-heading">
-                            <h4 class="panel-title">
-                                <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="accordion-btn">
-                                    Drivetrain<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-                                </a>
-                            </h4>
-                        </div>
-                        <div id="collapseThree" class="panel-collapse collapse in">
-                            <div class="panel-body facet" id="drive-container"></div>
-                        </div>
-                    </div>
-                </div>
-
+                </form>
             </div>
             <div class="col-md-9">
                 <div class="row" id="thumb-container"></div>

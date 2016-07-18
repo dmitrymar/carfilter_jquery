@@ -4,23 +4,12 @@
 
     var App = {
 		init: function () {
-            this.attributes =
-{
-    body: [
-        {attribute: "body", value: "Hatchback", checked: false, display: true},
-        {attribute: "body", value: "Sedan", checked: false, display: true},
-        {attribute: "body", value: "SUV", checked: false, display: true}
-    ],
-    drive: [
-        {attribute: "drive", value: "Front Wheel Drive", checked: false, display: true},
-        {attribute: "drive", value: "All Wheel Drive", checked: false, display: true},
-        {attribute: "drive", value: "Rear Wheel Drive", checked: false, display: true}
-    ]
-};
+
             // Used to keep track of which filter is a proiority. Beginning elements in the array become a priority
             // E.g. ["drive", "body"]
+            this.facets = ["body", "drive"]; // immutable
             this.levels = [];
-            this.store();
+            this.requestData()
 			this.bindEvents();
 		},
 		bindEvents: function () {
@@ -29,101 +18,81 @@
 		},
         render: function() {
             this.renderThumbs();
-            this.renderPanels();
+            this.renderFacets();
         },
-        store: function (data) {
-			if (arguments.length) {
-                return [].push(data);
-			} else {
-                // load initial data
-                var $xhr = $.getJSON("data.json");
-                $.when($xhr)
-                .done( function(data) {
-                    // store all car model objects in immutable array. (The values here never change)
-                    this.allModels = JSON.parse(JSON.stringify(data.models));
-                    // store car models in mutable array. The values change depending on user selection
-                    this.models = JSON.parse(JSON.stringify(data.models));
-                    this.render();
-                }.bind(this));
-			}
-		},
+        requestData: function(params) {
+            var endpoint = "/api/models";
+            var $xhr = $.getJSON(endpoint, params);
+            $.when($xhr)
+            .done( function(data) {
+                //console.log(data)
+                // store car models in mutable array. The values change depending on user selection
+                this.models = JSON.parse(JSON.stringify(data.models));
+                this.render();
+            }.bind(this));
+        },
         toggle: function(e) {
-            var checkbox = $(e.target).closest(".facet").find(".toggle");
-            var name = $(e.target).attr("name"); // e.g. body or drive
-            var selectedValue = $(e.target).val(); // e.g. Hatchback
-            var checked = $(e.target).is(":checked"); // true or false
-            this.filterData({checkbox: checkbox, name: name, selectedValue: selectedValue, checked: checked});
-            this.render();
-		},
-        filterData: function(settings) {
-            // either make new ajax request or filter current data (this.models)
+            //a list of selected checkboxes that gets sent to api endpoint
+            // E.g. {body: ["Hatchback"], drive: ["SUV"]}
 
-            if (this.levels.indexOf(settings.name) === -1) {
-                this.levels.push(settings.name)
+            var name = $(e.target).attr("name"); // e.g. body or drive
+            var data = $( "form" ).serializeArray(); // send parameters/data to server
+
+            if (this.levels.indexOf(name) === -1) {
+                this.levels.push(name)
             }
 
-            // set attribute checked value to true or false
-            this.attributes[settings.name].map(function(type) {
-                if (type.value === settings.selectedValue) {
-                    type.checked = !type.checked;
-                }
-            })
-            var shownCars = [];
+            // if first element in this levels doesn't match first element in data
+            // then reverse array sequence to make it the same
+            if (data.length && (this.levels[0] !== data[0].name)) {
+                data.reverse();
+            }
+            // get all data if no cheboxes are clicked
+            //$(".toggle").filter(":checked").length ? this.requestData(params) : this.requestData()
+            this.requestData(data)
+		},
+        renderFacets: function () {
+            // if a facet gets selected - it bacomes a parent so filter only children facets
+            // E.g. If checkbox in the "Body" facet is clicked - it becomes a parent and
+            // "Drive" facet becomes child
+            var allFacets = []
+            var string = [];
+            var facetsToFilter; // E.g. ["body", "drive"] or ["drive"] or ["body"]
 
+            // if nothing is clicked
+            if (!this.levels.length) {
+                facetsToFilter = this.facets
+            } else if (this.levels.length === 1) {
+                var item = this.levels[0] === "drive" ? "body" : "drive";
+                facetsToFilter = [item];
+            } else if (this.levels.length === 2) {
+                // set to the value to filter a child facet
+                facetsToFilter = [this.levels[1]]
+            }
 
-            //set model display value to true or false
-            this.models.map(function(car) {
+            //!this.levels.length ? ["body", "drive"] : ["drive"]
+            facetsToFilter.forEach(function(facet) {
+                function filterFacet(obj) {
 
-                // display all if all checboxes are unchecked
-                if (!$(".toggle").is(":checked")) {
-                    car.display = true;
-                } else {
-                    var previouslyChecked = $(settings.checkbox).filter("[value='" + car[settings.name] + "']").is(":checked");
-
-                    if (settings.checked) {
-                        if (car[settings.name] !== settings.selectedValue) {
-                            // if display has previously been set to true then keep true
-                            car.display = previouslyChecked ? true : false;
-                        } else {
-                            car.display = true;
-                        }
+                    if (allFacets.indexOf(obj[facet]) === -1) {
+                        allFacets.push(obj[facet])
+                        return true;
                     } else {
-                        //if checkbox is unchecked
-                        if (car[settings.name] !== settings.selectedValue) {
-                            car.display = previouslyChecked === false ? false : true;
-                        } else {
-                            car.display = false;
-                        }
+                        return false;
                     }
                 }
-                car.display ? shownCars.push(car.drive) : shownCars.push();
-            }.bind(this))
-            console.log(shownCars)
+                var facetArray = this.models.filter(filterFacet);
+                var string = facetArray.map(function(car){
+                    car.attribute = facet
+                    car.value = car[facet]
 
-            //filter facets
-            var attr = settings.name === "body" ? "drive" : "body";
-
-            this.attributes[attr].map(function(type) {
-                //console.log(settings.selectedValue)
-                // loop over and set display false
-                console.log(type.value + ' ' + (shownCars.indexOf(type.value) > -1))
-                if (shownCars.indexOf(type.value) === -1) {
-                    type.display = false;
-                }
-            })
-
-        },
-        renderPanels: function() {
-            for (var prop in this.attributes) {
-                var string = [];
-                string = this.attributes[prop].map(function(car){
                     return Template.displayName(car)
                 });
-                $("#"+prop+"-container").html(string.join(''));
-            }
+
+                $("#" +facet + "-container").html(string.join(''));
+            }.bind(this))
         },
 		renderThumbs: function () {
-            console.log(this.models);
             var carsString = this.models.map(function(car){
                 return Template.displayThumb(car)
             });
