@@ -1,12 +1,15 @@
 <html>
     <head>
         <title>Research a Car</title>
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
-        <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css">
+        <!-- Latest compiled and minified CSS -->
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" integrity="sha384-1q8mTJOASx8j1Au+a5WDVnPi2lkFfwwEAa8hDDdjZlpLegxhjVME1fgjWPGmkzs7" crossorigin="anonymous">
+
+
 
         <link rel="stylesheet" href="main.css" type="text/css" />
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.0/jquery.min.js"></script>
-        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" integrity="sha384-0mSbJDEHialfmuBBQP6A4Qrprq5OVfW37PRR3j5ELqxss1yVqOtnepnHVP9aJ7xS" crossorigin="anonymous"></script>
+
         <script>
             // this code is to prevent browser from caching js files
             var util = {
@@ -24,6 +27,7 @@
         <!-- <script language="JavaScript">util.preventCache("ajax-mocks.js")</script>  -->
         <script language="JavaScript">util.preventCache("ajax-mocks.js")</script>
         <script language="JavaScript">util.preventCache("templates.js")</script>
+        <script src="jquery.ba-bbq.min.js"></script>
         <script language="JavaScript">util.preventCache("main.js")</script>
     </head>
     <body>
@@ -46,6 +50,7 @@
     <div class="container">
         <div class="row">
             <div class="col-md-3" id="filterPanel">
+                <p class="hidden"><a href="" id="resetFilters">Clear all filters</a></p>
                 <form id="filterForm">
                     <div class="panel-group" id="accordion">
                         <div class="panel panel-default">
@@ -57,7 +62,7 @@
                                 </h4>
                             </div>
                             <div id="collapseTwo" class="panel-collapse collapse in">
-                                <div class="panel-body facet" id="body-container"></div>
+                                <div class="panel-body facet" data-facet="body" id="body-container"></div>
                             </div>
                         </div>
                         <div class="panel panel-default">
@@ -69,7 +74,7 @@
                                 </h4>
                             </div>
                             <div id="collapseThree" class="panel-collapse collapse in">
-                                <div class="panel-body facet" id="drive-container"></div>
+                                <div class="panel-body facet" data-facet="drive" id="drive-container"></div>
                             </div>
                         </div>
                     </div>
