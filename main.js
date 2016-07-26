@@ -1,7 +1,9 @@
 // make facets and thumbs change on data change
+// cache model data in session history so when going back or forward no need to make ajax request
 /* // do a reset function if all checkboxes are unchecked or entire one facet is checked */
 // replace serizalize with native FormData https://www.sitepoint.com/easier-ajax-html5-formdata-interface/
 // http://smalljs.org/client-side-routing/page/
+
 
 (function ($, Template) {
     "use strict";
@@ -13,10 +15,16 @@
             // E.g. ["drive", "body"]
             this.facets = ["body", "drive"]; // immutable
             this.resetLink = $("#resetFilters").closest('p');
+            this.deferred = $.Deferred();
+            this.models;
             this.parentFilter; // mutable
             this.firstLoad = true; // mutable
-            this.requestData()
-			this.bindEvents();
+            this.bindEvents();
+            this.route();
+
+
+
+
 		},
 		bindEvents: function () {
             $('.facet')
@@ -33,11 +41,24 @@
               // render thumbs
               this.resetFacets()
               this.tickCheckboxes();
-              this.requestData2($( "#filterForm" ).serializeArray());
 
             }.bind(this);
 
+            this.deferred.progress(function () {
+                console.log("model changed");
+                console.log(this.models);
+                this.render()
+            }.bind(this));
+
 		},
+        route: function() {
+            console.log("route")
+            if (window.location.search) {
+                this.requestData(window.location.search.substr(1));
+            } else {
+                this.requestData();
+            }
+        },
         render: function() {
             this.renderThumbs();
             this.renderFacets();
@@ -60,25 +81,14 @@
             $(this.resetLink).addClass("hidden")
         },
         requestData: function(params) {
+            console.log("requestData")
             var endpoint = "/api/models";
             var $xhr = $.getJSON(endpoint, params);
             $.when($xhr)
             .done( function(data) {
-                //console.log(data)
                 // store car models in mutable array. The values change depending on user selection
                 this.models = JSON.parse(JSON.stringify(data.models));
-                this.render();
-            }.bind(this));
-        },
-        requestData2: function(params) {
-            var endpoint = "/api/models";
-            var $xhr = $.getJSON(endpoint, params);
-            $.when($xhr)
-            .done( function(data) {
-                //console.log(data)
-                // store car models in mutable array. The values change depending on user selection
-                this.models = JSON.parse(JSON.stringify(data.models));
-                this.renderThumbs();
+                this.deferred.notify();
             }.bind(this));
         },
         toggle: function(e) {
@@ -86,7 +96,7 @@
             this.firstLoad = false;
 
             var name = $(e.target).attr("name"); // e.g. body or drive
-            var data = $( "#filterForm" ).serializeArray(); // send parameters/data to server
+            var data = $( "#filterForm" ).serialize().replace(/\+/g,'%20') // send parameters/data to server
             var facet = $(e.target).closest(".facet");
 
 
@@ -105,11 +115,6 @@
                 this.parentFilter = $(".facet").filter(".selected").data("facet");
             }
 
-            // if first element in this levels doesn't match first element in data
-            // then reverse array sequence to make it the same
-            if (data.length && (this.parentFilter !== data[0].name)) {
-                data.reverse();
-            }
             // get all data if no cheboxes are clicked
             //$(".toggle").filter(":checked").length ? this.requestData(params) : this.requestData()
             this.requestData(data)
@@ -143,7 +148,7 @@
             !Object.keys(params).length ? $(this.resetLink).addClass("hidden") : $(this.resetLink).removeClass("hidden");
         },
         setURL: function () {
-            var serializedData = !$( "#filterForm" ).serialize() ? "/" : "?" + $( "#filterForm" ).serialize();
+            var serializedData = !$( "#filterForm" ).serialize() ? "/" : "?" + $( "#filterForm" ).serialize().replace(/\+/g,'%20');
             if (window.location.search && this.firstLoad) {
                 this.tickCheckboxes();
             } else {

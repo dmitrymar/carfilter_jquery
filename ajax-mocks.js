@@ -80,31 +80,28 @@ $.mockjax({
 		// if no parameters are sent then display all data
 		this.responseText = json;
 	} else {
-		var models = [], bodies = [], drives = [];
+		var query = decodeURIComponent(settings.data);
+		var models = [];
+		var bodyCount = (query.match(/body/g) || []).length;
+		var driveCount = (query.match(/drive/g) || []).length;
 
-		settings.data.forEach(function(item) {
-			item.name === "drive" ? drives.push(item.value) : bodies.push(item.value);
-		})
-
-		function filterArray(obj) {
-		  if (bodies.length > 0 && drives.length > 0) {
-			if (bodies.indexOf(obj.body) > -1 && drives.indexOf(obj.drive) > -1) {
-			  return true;
+		function filterArray (obj) {
+			if (bodyCount > 0 && driveCount === 0) {
+				if (query.includes(obj.body)) {
+					return true;
+				}
+			} else if (driveCount > 0 && bodyCount === 0) {
+				if (query.includes(obj.drive)) {
+					return true;
+				}
+			} else if (bodyCount > 0 && driveCount > 0) {
+				if (query.includes(obj.body) && query.includes(obj.drive)) {
+					return true;
+				}
 			}
-		  } else if (bodies.length > 0 && drives.length === 0) {
-			if (bodies.indexOf(obj.body) > -1) {
-			  return true;
-			}
-		  } else if (drives.length > 0 && bodies.length === 0) {
-			if (drives.indexOf(obj.drive) > -1) {
-			  return true;
-			}
-		  }
 		}
 
 		models.push.apply(models, json.models.filter(filterArray))
-
-		console.log(models)
 		this.responseText = {"models": models};
 	}
   }
