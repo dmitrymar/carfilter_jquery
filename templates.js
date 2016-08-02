@@ -22,7 +22,7 @@ var Template = {
         var checked = car.checked ? "checked" : "";
         var template = `<div class="checkbox">
                           <label>
-                            <input type="checkbox" name="${car.attribute}" data-id="" class="toggle" value="${car.value}">
+                            <input type="checkbox" name="${car.name}" data-id="" class="toggle" value="${car.value}" ${checked}>
                             ${car.value}
                           </label>
                         </div>`

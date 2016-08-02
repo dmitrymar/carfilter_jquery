@@ -16,41 +16,94 @@
             this.facets = ["body", "drive"]; // immutable
             this.resetLink = $("#resetFilters").closest('p');
             this.deferred = $.Deferred();
+            this.stateChanged = false;
             this.models;
+            this.params;
             this.parentFilter; // mutable
             this.firstLoad = true; // mutable
             this.bindEvents();
             this.route();
-
-
-
-
 		},
 		bindEvents: function () {
-            $('.facet')
-				.on('change', '.toggle', this.toggle.bind(this));
+            $('.facet').on('change', '.toggle', this.changeView.bind(this));
             $('#resetFilters').on('click', this.reset.bind(this));
 
             // if state changes then change view depending on location.search value
             window.onpopstate = function(event) {
               console.log("state changed");
-
-              // grap the new url
-              // use new url to render facets
-              // serialize all facets
-              // render thumbs
-              this.resetFacets()
-              this.tickCheckboxes();
-
+              this.stateChanged = true;
+              this.models = history.state.data
+              console.log(this.models)
+              // make sure renderFacets uses history.state.params
+              this.setParentFilter();
+              this.render();
+              this.displayResetLink();
+              //this.resetFacets()
+              //this.tickCheckboxes();
+              this.stateChanged = false;
             }.bind(this);
 
             this.deferred.progress(function () {
                 console.log("model changed");
                 console.log(this.models);
-                this.render()
+                this.render();
+                this.setHistory();
             }.bind(this));
 
 		},
+        changeView: function(e) {
+            console.log("changeView")
+            this.firstLoad = false;
+            this.createParam(e);
+            this.selectFacet(e);
+            this.setParentFilter(e);
+            this.requestData(this.params)
+            // render() is fired
+            this.displayResetLink();
+        },
+        displayResetLink: function() {
+            if ($(".toggle").filter(":checked").length) {
+                $(this.resetLink).removeClass("hidden")
+            } else {
+                $(this.resetLink).addClass("hidden")
+            }
+        },
+        selectFacet: function(e) {
+            var facet = $(e.target).closest(".facet");
+
+            if ($(facet).find(".toggle").filter(":checked").length) {
+                $(facet).addClass("selected");
+            } else {
+                $(facet).removeClass("selected");
+            }
+        },
+        setParentFilter: function(e) {
+            console.log("setParentFilter")
+            if (e) {
+                var name = $(e.target).attr("name"); // e.g. body or drive
+                var facet = $(e.target).closest(".facet");
+
+                this.parentFilter = !this.parentFilter ? name : this.parentFilter;
+
+                if (!this.parentFilter) {
+                    this.parentFilter = name;
+                } else if (this.parentFilter === name && !$(facet).hasClass("selected")) {
+                    // if the parent filter has been removed set parent to another selected facet
+                    this.parentFilter = $(".facet").filter(".selected").data("facet");
+                }
+            } else {
+                // when state changes by clicking back button
+                var params = history.state.params;
+                if (!params) {
+                    this.parentFilter = undefined;
+                } else {
+                    console.log(params)
+                    this.parentFilter = "?drive=All%20Wheel%20Drive".indexOf("drive") === 1 ? "drive" : "body";
+                }
+
+            }
+
+        },
         route: function() {
             console.log("route")
             if (window.location.search) {
@@ -62,23 +115,23 @@
         render: function() {
             this.renderThumbs();
             this.renderFacets();
-            this.setURL();
         },
         reset: function (event) {
-
-
             console.log("reset clicked");
             event.preventDefault();
             this.firstLoad = false;
-            this.resetFacets();
+            console.log(this.params)
+            this.params = ""
             this.requestData();
+            this.resetFacets();
             $(this.resetLink).addClass("hidden");
+            this.setHistory();
         },
         resetFacets: function() {
             this.parentFilter = "";
             $(".facet").removeClass("selected");
             $(".toggle").attr("checked", false);
-            $(this.resetLink).addClass("hidden")
+            $(this.resetLink).addClass("hidden");
         },
         requestData: function(params) {
             console.log("requestData")
@@ -91,71 +144,67 @@
                 this.deferred.notify();
             }.bind(this));
         },
-        toggle: function(e) {
-            console.log("toggle function")
-            this.firstLoad = false;
-
+        createParam: function(e) {
             var name = $(e.target).attr("name"); // e.g. body or drive
-            var data = $( "#filterForm" ).serialize().replace(/\+/g,'%20') // send parameters/data to server
-            var facet = $(e.target).closest(".facet");
-
-
-            this.parentFilter = !this.parentFilter ? name : this.parentFilter;
-
-            if ($(facet).find(".toggle").filter(":checked").length) {
-                $(facet).addClass("selected")
-            } else {
-                $(facet).removeClass("selected")
-            }
-
-            if (!this.parentFilter) {
-                this.parentFilter = name;
-            } else if (this.parentFilter === name && !$(facet).hasClass("selected")) {
-                // if the parent filter has been removed set parent to another selected facet
-                this.parentFilter = $(".facet").filter(".selected").data("facet");
-            }
-
-            // get all data if no cheboxes are clicked
-            //$(".toggle").filter(":checked").length ? this.requestData(params) : this.requestData()
-            this.requestData(data)
-
-            if ($(".toggle").filter(":checked").length) {
-                $(this.resetLink).removeClass("hidden")
-            } else {
-                $(this.resetLink).addClass("hidden")
-            }
-		},
-        tickCheckboxes: function() {
-            console.log("tickCheckboxes");
-            // this uses plugin jquery bbq
-            var params = $.deparam.querystring();
-            console.log(params)
-            for (var key in params) {
-                // add selected to facet
-                $("[data-facet='" + key + "']").addClass("selected");
-
-                // select checkboxes
-                if (Array.isArray(params[key])) {
-                    params[key].forEach(function(value) {
-                        console.log(value)
-                        $("[value='"+value+"']").prop("checked", true)
-                    })
+            var value = $(e.target).val();
+            var string = name + "=" + value;
+            string = string.replace(/\s/g,'%20');
+            if (this.params) {
+                if (this.params.includes(string)) {
+                    console.log("replace string")
+                    var prefix = this.params.includes("&") ? "&" : "?";
+                    this.params = this.params.replace(prefix + string,'');
+                    console.log(this.params);
                 } else {
-                    $("[value='"+params[key]+"']").prop("checked", true)
+                    this.params = this.params + "&" + string;
                 }
+            } else {
+                this.params = "?" + string;
             }
 
-            !Object.keys(params).length ? $(this.resetLink).addClass("hidden") : $(this.resetLink).removeClass("hidden");
-        },
-        setURL: function () {
-            var serializedData = !$( "#filterForm" ).serialize() ? "/" : "?" + $( "#filterForm" ).serialize().replace(/\+/g,'%20');
-            if (window.location.search && this.firstLoad) {
-                this.tickCheckboxes();
+            //console.log($(e.target).is(":checked"));
+		},
+        setHistory: function () {
+            console.log("setHistory")
+            var params;
+            var facetArray = [];
+            $(".toggle").each(function(key, value) {
+                facetArray.push({
+                    name: $(value).attr("name"),
+                    value: $(value).val(),
+                    checked: $(value).is(":checked")
+                })
+            })
+            console.log(facetArray);
+            if (this.params === undefined) {
+                params = null;
+                history.replaceState({params:params, facets:facetArray, data:this.models}, null, params);
+            } else if (this.params === "") {
+                params = "/"
+                history.pushState({params:params, facets:facetArray, data:this.models}, null, params);
             } else {
-                history.pushState(null, null, serializedData);
+                params = this.params;
+                history.pushState({params:params, facets:facetArray, data:this.models}, null, params);
             }
         },
         renderFacets: function () {
+            console.log("renderFacets");
+            if (this.stateChanged) {
+                this.renderCheckboxesState();
+            } else {
+                this.renderCheckboxes();
+            }
+        },
+        renderCheckboxesState: function() {
+            console.log("renderCheckboxesState")
+            var facetArray = history.state.facets;
+            $(".facet").html("");
+            facetArray.map(function(car){
+                var string = Template.displayName(car)
+                $("#" +car.name + "-container").append(string);
+            });
+        },
+        renderCheckboxes: function() {
             // if a facet gets selected - it bacomes a parent so filter only children facets
             // E.g. If checkbox in the "Body" facet is clicked - it becomes a parent and
             // "Drive" facet becomes child
@@ -184,7 +233,7 @@
                     }
                     var facetArray = this.models.filter(filterFacet);
                     var string = facetArray.map(function(car){
-                        car.attribute = facet
+                        car.name = facet
                         car.value = car[facet]
 
                         return Template.displayName(car)
