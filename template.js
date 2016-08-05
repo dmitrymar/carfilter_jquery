@@ -1,5 +1,12 @@
-var Template = {
-    displayThumb: function(car) {
+// convert to classes
+(function (window) {
+    "use strict";
+
+    // constructor
+    function Template() {
+	}
+
+    Template.prototype.displayThumb = function (car) {
         var template = `<div class="col-sm-6 col-md-4">
                           <a href="${car.link}">
                             <div class="thumbnail">
@@ -15,10 +22,11 @@ var Template = {
                               </div>
                             </div>
                           </a>
-                        </div>`
-        return template
-    },
-    displayName: function(car) {
+                      </div>`;
+        return template;
+    };
+
+    Template.prototype.displayName = function (car) {
         var checked = car.checked ? "checked" : "";
         var disabled = car.disabled ? "disabled" : "";
         var template = `<div class="checkbox ${disabled}">
@@ -26,8 +34,12 @@ var Template = {
                             <input type="checkbox" name="${car.name}" data-id="" class="toggle" value="${car.value}" ${checked} ${disabled}>
                             ${car.value}
                           </label>
-                        </div>`
-        //console.log(car.drive)
-        return template
-    }
-};
+                      </div>`;
+
+        return template;
+    };
+
+    // Export to window
+	window.app = window.app || {};
+	window.app.Template = Template;
+}(window));

@@ -1,13 +1,18 @@
-/* // do a reset function if all checkboxes are unchecked or entire one facet is checked */
-// replace serizalize with native FormData https://www.sitepoint.com/easier-ajax-html5-formdata-interface/
-// http://smalljs.org/client-side-routing/page/
-
-
-(function ($, Template) {
+// convert to classes
+(function (window) {
     "use strict";
 
+    // constructor
+    function Controller() {
+
+	}
+
+    // Controller.prototype.init = function(template) {
+    //     //App.init(template);
+    // };
+
     var App = {
-		init: function () {
+		init: function (template) {
 
             // Used to keep track of which filter is a proiority. Beginning elements in the array become a priority
             // E.g. ["drive", "body"]
@@ -21,6 +26,7 @@
             this.params;
             this.parentFilter; // mutable
             this.firstLoad = true; // mutable
+            this.template = template;
             this.bindEvents();
             this.route();
 		},
@@ -220,7 +226,7 @@
             var facetArray = history.state.facets;
             $(".facet").html("");
             facetArray.map(function(car){
-                var string = Template.displayName(car)
+                var string = this.template.displayName(car)
                 $("#" +car.name + "-container").append(string);
             });
         },
@@ -264,7 +270,7 @@
                         car.disabled = disabled;
                         //car.checked = checked;
 
-                        return Template.displayName(car);
+                        return this.template.displayName(car);
                     });
                     $("#" +facet + "-container").html(string.join(''));
                 }.bind(this))
@@ -272,12 +278,14 @@
         },
 		renderThumbs: function () {
             var carsString = this.models.map(function(car){
-                return Template.displayThumb(car)
+                return this.template.displayThumb(car)
             });
 
             $("#thumb-container").html(carsString.join(''));
 		}
 	};
 
-	App.init();
-}(window.jQuery, Template));
+    // Export to window
+	window.app = window.app || {};
+	window.app.Controller = Controller;
+}(window));
