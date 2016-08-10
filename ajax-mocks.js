@@ -74,9 +74,11 @@ $.mockjax({
   url: "/api/models",
   contentType: "application/json",
   response: function(settings) {
+	  console.log("settings.data");
+	  console.log(settings.data)
 
 	// if parameters have not been sent or are sent but empty
-	if (settings.data === undefined || !settings.data.length) {
+	if (!settings.data) {
 		// if no parameters are sent then display all data
 		this.responseText = json;
 	} else {
