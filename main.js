@@ -12,8 +12,11 @@
 // http://smalljs.org/client-side-routing/page/
 
 
-(function ($, Template) {
+(function ($, app, Template) {
     "use strict";
+
+    var utils = new app.Utils();
+    var tmpl = new Template();
 
     var App = {
 		init: function () {
@@ -24,20 +27,19 @@
             this.resetLink = $("#resetFilters").closest('p');
             this.deferredData = $.Deferred();
             this.deferredReset = $.Deferred();
-            this.utils = new app.Utils();
             this.paramsArray = [];
             this.models;
-            this.params;
+            this.params = "";
             this.bindEvents();
             this.route();
 		},
 		bindEvents: function () {
-            $('.facet').on('change', '.toggle', this.changeView.bind(this));
+            $('#filterForm').on('change', '.toggle', this.changeView.bind(this));
             $('#resetFilters').on('click', this.reset.bind(this));
 
             this.deferredData.progress(function () {
                 console.log("model changed");
-                console.log(this.models);
+                console.log(this.facets);
                 this.render();
             }.bind(this));
 
@@ -50,27 +52,17 @@
             var name = $(e.target).attr("name");
             var value = $(e.target).val();
             this.selectedFacet = name;
-            this.paramsArray = this.utils.createParamArray(name, value, this.paramsArray)
-            this.params = this.utils.createParamString(name, value, this.params, this.paramsArray);
-            this.selectPanel(e);
-            this.requestData(e)
+            this.paramsArray = utils.createParamArray(name, value, this.paramsArray)
+            this.params = utils.createParamString(name, value, this.params, this.paramsArray);
+            this.requestData(e);
             // render() is fired
             this.displayResetLink();
         },
         displayResetLink: function() {
             if ($(".toggle").filter(":checked").length) {
-                $(this.resetLink).removeClass("hidden")
+                $(this.resetLink).removeClass("hidden");
             } else {
-                $(this.resetLink).addClass("hidden")
-            }
-        },
-        selectPanel: function(e) {
-            var facet = $(e.target).closest(".facet");
-
-            if ($(facet).find(".toggle").filter(":checked").length) {
-                $(facet).addClass("selected");
-            } else {
-                $(facet).removeClass("selected");
+                $(this.resetLink).addClass("hidden");
             }
         },
         route: function() {
@@ -104,8 +96,7 @@
         reset: function (event) {
             console.log("reset clicked");
             event.preventDefault();
-            console.log(this.params)
-            this.params = ""
+            this.params = "";
             this.requestData();
             this.resetFacets();
             $(this.resetLink).addClass("hidden");
@@ -115,70 +106,39 @@
             $(".toggle").attr("checked", false);
             $(this.resetLink).addClass("hidden");
         },
-        requestData: function(e) {
+        requestData: function() {
             console.log("requestData")
             var endpoint = "/api/models";
             var $xhr = $.getJSON(endpoint, this.params);
             $.when($xhr)
-            .done( function(data) {
+            .done( function(response) {
+
                 // store car models in mutable array. The values change depending on user selection
-                this.models = JSON.parse(JSON.stringify(data.models));
+                this.models = response.models;
+                this.facets = response.facets
                 this.deferredData.notify();
             }.bind(this));
         },
         renderFacets: function () {
             console.log("renderFacets");
-                this.renderCheckboxes();
-        },
-        renderCheckboxes: function() {
-            // To Do: Create a facet array and create a template from it
-            // if a facet gets selected - it bacomes a parent so filter only children facets
-            // E.g. If checkbox in the "Body" facet is clicked - it becomes a parent and
-            // "Drive" facet becomes child
-            var allFacets = []
-            var string = [];
-            var facetsToFilter; // E.g. ["body", "drive"] or ["drive"] or ["body"]
+            var facetString = "";
 
-            // if nothing is clicked
-            if (!this.selectedFacet) {
-                facetsToFilter = this.facets
-            } else {
+            for (var facet in this.facets) {
+                facetString += tmpl.renderFacetTitle(facet);
 
-                var item = this.selectedFacet === "drive" ? "body" : "drive";
-                facetsToFilter = [item];
-                console.log("facetsToFilter")
-                console.log(facetsToFilter);
+                var checkboxString = this.facets[facet].map(function(type){
+                    var checked = this.params.includes(encodeURIComponent(type)) ? true : false;
+                    return tmpl.renderCheckboxes(facet, type, checked);
+                }.bind(this));
+                facetString += checkboxString.join('');
+                facetString += "<br>"
             }
 
-            if ($('.facet.selected').length <= 2) {
-                facetsToFilter.forEach(function(facet) {
-                    function filterFacet(obj) {
-
-                        if (allFacets.indexOf(obj[facet]) === -1) {
-                            allFacets.push(obj[facet])
-                            return true;
-                        } else {
-                            return false;
-                        }
-                    }
-                    var facetArray = this.models.filter(filterFacet);
-                    var disabled = facetArray.length === 1 ? true : false;
-                    var checked = disabled ? true : false;
-                    var string = facetArray.map(function(car){
-                        car.name = facet;
-                        car.value = car[facet];
-                        car.disabled = disabled;
-                        //car.checked = checked;
-
-                        return Template.displayName(car);
-                    });
-                    $("#" +facet + "-container").html(string.join(''));
-                }.bind(this))
-            }
+            $("#filterForm").html(facetString);
         },
 		renderThumbs: function () {
             var carsString = this.models.map(function(car){
-                return Template.displayThumb(car)
+                return tmpl.displayThumb(car);
             });
 
             $("#thumb-container").html(carsString.join(''));
@@ -186,4 +146,4 @@
 	};
 
 	App.init();
-}(window.jQuery, Template));
+}(window.jQuery, app, Template));

@@ -21,12 +21,13 @@ var Template = {
     displayName: function(car) {
         var checked = car.checked ? "checked" : "";
         var disabled = car.disabled ? "disabled" : "";
-        var template = `<div class="checkbox ${disabled}">
+        var template = `<h5>${car.title}</h5>
+                        <div class="checkbox ${disabled}">
                           <label>
                             <input type="checkbox" name="${car.name}" data-id="" class="toggle" value="${car.value}" ${checked} ${disabled}>
                             ${car.value}
                           </label>
-                        </div>`
+                        </div><br><br>`
         //console.log(car.drive)
         return template
     }

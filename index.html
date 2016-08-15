@@ -26,7 +26,7 @@
         <script src="jquery.mockjax.min.js" async></script>
         <script language="JavaScript">util.preventCache("utils.js")</script>
         <script language="JavaScript">util.preventCache("ajax-mocks.js")</script>
-        <script language="JavaScript">util.preventCache("templates.js")</script>
+        <script language="JavaScript">util.preventCache("template.js")</script>
         <script src="jquery-deparam.js"></script>
         <script language="JavaScript">util.preventCache("main.js")</script>
         <!-- <script language="JavaScript">util.preventCache("template.js")</script>
@@ -55,32 +55,6 @@
             <div class="col-md-3" id="filterPanel">
                 <p class="hidden"><a href="" id="resetFilters">Clear all filters</a></p>
                 <form id="filterForm">
-                    <div class="panel-group" id="accordion">
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseTwo" class="accordion-btn">
-                                        Body Type<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="collapseTwo" class="panel-collapse collapse in">
-                                <div class="panel-body facet" data-facet="body" id="body-container"></div>
-                            </div>
-                        </div>
-                        <div class="panel panel-default">
-                            <div class="panel-heading">
-                                <h4 class="panel-title">
-                                    <a data-toggle="collapse" data-parent="#accordion" href="#collapseThree" class="accordion-btn">
-                                        Drivetrain<span class="glyphicon glyphicon-menu-down" aria-hidden="true"></span>
-                                    </a>
-                                </h4>
-                            </div>
-                            <div id="collapseThree" class="panel-collapse collapse in">
-                                <div class="panel-body facet" data-facet="drive" id="drive-container"></div>
-                            </div>
-                        </div>
-                    </div>
                 </form>
             </div>
             <div class="col-md-9">

@@ -67,8 +67,12 @@ var json = {
 		"price": "83,000",
 		"body": "SUV",
 		"drive": "All Wheel Drive"
-	}]
-}
+	}],
+	"facets": {
+		"body": ["Hatchback", "Sedan", "SUV"],
+		"drive": ["Front Wheel Drive", "All Wheel Drive", "Rear Wheel Drive"]
+	}
+};
 
 $.mockjax({
   url: "/api/models",
@@ -83,9 +87,12 @@ $.mockjax({
 		this.responseText = json;
 	} else {
 		var query = decodeURIComponent(settings.data);
-		var models = [];
+
+		var models = [], bodyArray = [], driveArray = [];
 		var bodyCount = (query.match(/body/g) || []).length;
 		var driveCount = (query.match(/drive/g) || []).length;
+		var queryObj = deparam(query);
+		var facetToFilter;
 
 		function filterArray (obj) {
 			if (bodyCount > 0 && driveCount === 0) {
@@ -103,8 +110,31 @@ $.mockjax({
 			}
 		}
 
-		models.push.apply(models, json.models.filter(filterArray))
-		this.responseText = {"models": models};
+
+		function filterFacet (item) {
+			if (JSON.stringify(models).includes(item)) {
+				console.log(item)
+				return true;
+			}
+		}
+
+		models.push.apply(models, json.models.filter(filterArray));
+		// create map models to bodyArray and driveArray
+
+		if (Object.keys(queryObj).length = 1) {
+			console.log("equal 1");
+			console.log(queryObj);
+			if (bodyCount) {
+				driveArray.push.apply(driveArray, json.facets.drive.filter(filterFacet));
+				bodyArray = json.facets.body;
+			} else {
+				bodyArray.push.apply(bodyArray, json.facets.body.filter(filterFacet));
+				driveArray = json.facets.drive;
+			}
+		} else {
+			console.log("queryObj length is > 1")
+		}
+		this.responseText = {"models": models, "facets": {"body": bodyArray, "drive": driveArray}};
 	}
   }
 });

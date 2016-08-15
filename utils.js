@@ -17,28 +17,11 @@
         return paramsArray;
     };
 
-Utils.prototype.createParamString = function (name, value, params, paramsArray) {
-    console.log("paramsArray")
-    console.log(paramsArray);
-    var paramString = $.param(paramsArray);
-    paramString = paramString.replace(/\+/g,'%20');
-    console.log(paramString)
-    // var string = name + "=" + value;
-    // string = string.replace(/\s/g,'%20');
-    // if (params) {
-    //     if (params.includes(string)) {
-    //         console.log("replace string")
-    //         params = params.replace(string,'');
-    //         params = params.replace("?&",'?');
-    //     } else {
-    //         params = params + "&" + string;
-    //     }
-    // } else {
-    //     params = "?" + string;
-    // }
-    // params = params === "?" ? null : params;
-    return paramString;
-};
+	Utils.prototype.createParamString = function (name, value, params, paramsArray) {
+	    var paramString = $.param(paramsArray);
+	    paramString = paramString.replace(/\+/g,'%20');
+	    return paramString;
+	};
 
 
 

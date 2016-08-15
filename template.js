@@ -1,13 +1,19 @@
-// convert to classes
-(function (window) {
-    "use strict";
-
-    // constructor
-    function Template() {
-	}
-
-    Template.prototype.displayThumb = function (car) {
-        var template = `<div class="col-sm-6 col-md-4">
+class Template {
+    renderFacetTitle(facet) {
+        let title = facet === "body" ? "Body Type": "Drivetrain";
+        return `<h5>${title}</h5>`;
+    }
+    renderCheckboxes(name, value, checked) {
+        checked = checked ? "checked" : "";
+        return `<div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="${name}" data-id="" class="toggle" value="${value}" ${checked}>
+                        ${value}
+                    </label>
+                </div>`;
+    }
+    displayThumb (car) {
+        return `<div class="col-sm-6 col-md-4">
                           <a href="${car.link}">
                             <div class="thumbnail">
                               <img class="thumbnail-pic" src="${car.imageURL}">
@@ -23,23 +29,5 @@
                             </div>
                           </a>
                       </div>`;
-        return template;
-    };
-
-    Template.prototype.displayName = function (car) {
-        var checked = car.checked ? "checked" : "";
-        var disabled = car.disabled ? "disabled" : "";
-        var template = `<div class="checkbox ${disabled}">
-                          <label>
-                            <input type="checkbox" name="${car.name}" data-id="" class="toggle" value="${car.value}" ${checked} ${disabled}>
-                            ${car.value}
-                          </label>
-                      </div>`;
-
-        return template;
-    };
-
-    // Export to window
-	window.app = window.app || {};
-	window.app.Template = Template;
-}(window));
+    }
+}
