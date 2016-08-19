@@ -1,142 +1,129 @@
-(function ($) {
+(function ($, deparam, Cardata) {
 
-var json = {
-	"models": [{
-		"link": "http://www.fiatusa.com/en/500e/",
-		"imageURL": "http://media.ed.edmunds-media.com/fiat/500e/2016/oem/2016_fiat_500e_2dr-hatchback_base_fq_oem_1_276.jpg",
-		"year": "2016",
-		"make": "FIAT",
-		"model": "500e",
-		"trim": "",
-		"range": "87",
-		"price": "31,800",
-		"body": "Hatchback",
-		"drive": "Front Wheel Drive"
-	}, {
-		"link": "http://www.nissanusa.com/Leaf",
-		"imageURL": "http://media.ed.edmunds-media.com/nissan/leaf/2016/oem/2016_nissan_leaf_4dr-hatchback_sl_fq_oem_4_276.jpg",
-		"year": "2016",
-		"make": "Nissan",
-		"model": "Leaf",
-		"trim": "30kWh",
-		"range": "107",
-		"price": "34,200",
-		"body": "Hatchback",
-		"drive": "Front Wheel Drive"
-	}, {
-		"link": "https://www.mbusa.com/mercedes/vehicles/model/class-B/model-B250E",
-		"imageURL": "http://media.ed.edmunds-media.com/mercedes-benz/b-class-electric-drive/2016/oem/2016_mercedes-benz_b-class-electric-drive_4dr-hatchback_b250e_fq_oem_1_276.jpg",
-		"year": "2016",
-		"make": "Mercedes-Benz",
-		"model": "B250e",
-		"trim": "",
-		"range": "87",
-		"price": "41,450",
-		"body": "Hatchback",
-		"drive": "Front Wheel Drive"
-	}, {
-		"link": "https://www.teslamotors.com/models",
-		"imageURL": "http://media.ed.edmunds-media.com/tesla/model-s/2016/oem/2016_tesla_model-s_sedan_p90d_fq_oem_2_276.jpg",
-		"year": "2016",
-		"make": "Tesla",
-		"model": "Model S",
-		"trim": "70D",
-		"range": "240",
-		"price": "75,000",
-		"body": "Sedan",
-		"drive": "All Wheel Drive"
-	}, {
-		"link": "http://www.mitsubishicars.com/imiev",
-		"imageURL": "http://media.ed.edmunds-media.com/mitsubishi/i-miev/2012/oem/2012_mitsubishi_i-miev_4dr-hatchback_es_fq_oem_6_276.jpg",
-		"year": "2016",
-		"make": "Mitsubishi",
-		"model": "i-MiEV",
-		"trim": "",
-		"range": "62",
-		"price": "22,995",
-		"body": "Hatchback",
-		"drive": "Rear Wheel Drive"
-	}, {
-		"link": "https://www.teslamotors.com/modelx",
-		"imageURL": "https://media.ed.edmunds-media.com/tesla/model-x/2016/oem/2016_tesla_model-x_4dr-suv_p90d_fq_oem_1_276.jpg",
-		"year": "2016",
-		"make": "Tesla",
-		"model": "Model X",
-		"trim": "75D",
-		"range": "237",
-		"price": "83,000",
-		"body": "SUV",
-		"drive": "All Wheel Drive"
-	}],
-	"facets": {
-		"body": ["Hatchback", "Sedan", "SUV"],
-		"drive": ["Front Wheel Drive", "All Wheel Drive", "Rear Wheel Drive"]
-	}
-};
+	var cardata = new Cardata();
+	var json = cardata.zevs;
 
 $.mockjax({
   url: "/api/models",
   contentType: "application/json",
   response: function(settings) {
-	  console.log("settings.data");
-	  console.log(settings.data)
 
-	// if parameters have not been sent or are sent but empty
-	if (!settings.data) {
-		// if no parameters are sent then display all data
-		this.responseText = json;
-	} else {
 		var query = decodeURIComponent(settings.data);
-
-		var models = [], bodyArray = [], driveArray = [];
-		var bodyCount = (query.match(/body/g) || []).length;
-		var driveCount = (query.match(/drive/g) || []).length;
+		var models = $("body").data("models") || [];
+		var filteredFacets = {"range": [], "body": [], "drive": []};
+		var firstFacet = query.substring(0, 5);
 		var queryObj = deparam(query);
-		var facetToFilter;
+		var oppositeFacets = {
+			range: ["body", "drive"],
+			body: ["range", "drive"],
+			drive: ["range", "body"]
+		};
 
 		function filterArray (obj) {
-			if (bodyCount > 0 && driveCount === 0) {
-				if (query.includes(obj.body)) {
-					return true;
+			var counter = 0;
+
+			for (var key in queryObj) {
+				// key e.g "range"
+
+				if (Object.keys(queryObj).length === 1) {
+					// if 1 facet is matched. E.g. SUV
+
+					// obj[key1] e.g. "0-100"
+					if (query.includes(obj[key])) {
+						return true;
+					}
+				} else if (Object.keys(queryObj).length === 2) {
+					// if 2 facets are matched // For ex. 200-400 miles, SUV
+
+						if (query.includes(obj[key])) {
+							for (var key2 in queryObj) {
+								if (key !== key2 && query.includes(obj[key2])) {
+									return true;
+								}
+							}
+						}
+				} else {
+					// if all facets are in query then check that each facet type is matched
+					// For ex. 200-400 miles, SUV, All wheel drive
+
+					if (query.includes(obj[key])) {
+						counter++;
+					}
+
+					if (counter === 3) {return true;}
 				}
-			} else if (driveCount > 0 && bodyCount === 0) {
-				if (query.includes(obj.drive)) {
-					return true;
-				}
-			} else if (bodyCount > 0 && driveCount > 0) {
-				if (query.includes(obj.body) && query.includes(obj.drive)) {
-					return true;
-				}
-			}
+			} // end top for loop
 		}
 
+		function storeData(item) {
+			var facetType;
+			for (var key in json.facets) {
+				if (json.facets[key].includes(item)) {
+					facetType = key;
+				}
+			}
+			//var facetType = json.facets.body.includes(item) ? "body" : "drive";
+			var facetTypeArray = $( "body" ).data( facetType ) || [];
+			!facetTypeArray.includes(item) ? facetTypeArray.push(item) : facetTypeArray.push();
+			$( "body" ).data( facetType,  facetTypeArray);
+
+		}
 
 		function filterFacet (item) {
 			if (JSON.stringify(models).includes(item)) {
-				console.log(item)
+				console.log("filterFacet")
+				storeData(item)
 				return true;
 			}
 		}
 
-		models.push.apply(models, json.models.filter(filterArray));
-		// create map models to bodyArray and driveArray
-
-		if (Object.keys(queryObj).length = 1) {
-			console.log("equal 1");
-			console.log(queryObj);
-			if (bodyCount) {
-				driveArray.push.apply(driveArray, json.facets.drive.filter(filterFacet));
-				bodyArray = json.facets.body;
-			} else {
-				bodyArray.push.apply(bodyArray, json.facets.body.filter(filterFacet));
-				driveArray = json.facets.drive;
-			}
-		} else {
-			console.log("queryObj length is > 1")
+		function parentChildrenFacets(facet) {
+			filteredFacets[facet].push.apply(filteredFacets[facet], json.facets[facet].filter(filterFacet));
+			oppositeFacets[facet].forEach(function(el) {
+				filteredFacets[el] = $( "body" ).data( el );
+			});
 		}
-		this.responseText = {"models": models, "facets": {"body": bodyArray, "drive": driveArray}};
-	}
+
+		function getFilteredFacets() {
+			if (Object.keys(queryObj).length === 1) {
+				console.log("equal 1");
+				for (var key in json.facets) {
+					if (queryObj.hasOwnProperty(key)) {
+						oppositeFacets[key].forEach(function(el) {
+							filteredFacets[el].push.apply(filteredFacets[el], json.facets[el].filter(filterFacet));
+						});
+						filteredFacets[key] = json.facets[key];
+					}
+				}
+			} else {
+				console.log("queryObj length is > 1")
+
+				for (var facet in json.facets) {
+					if (firstFacet.includes(facet)) {
+						parentChildrenFacets(facet);
+					}
+				}
+			}
+		}
+
+		function getFilteredData() {
+			// if models is empty then use json.models to filter
+			if (models.length) {
+				models = models.filter(filterArray);
+			} else {
+				models.push.apply(models, json.models.filter(filterArray));
+				debugger
+			}
+			$("body").data("models", models);
+			getFilteredFacets();
+			return {
+				"models": models, "facets": filteredFacets
+			};
+		}
+
+		// if no parameters are sent then display all data
+		this.responseText = !settings.data ? json : getFilteredData();
   }
 });
 
-}(window.jQuery));
+}(window.jQuery, deparam, Cardata));

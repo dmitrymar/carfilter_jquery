@@ -124,8 +124,8 @@
             var facetString = "";
 
             for (var facet in this.facets) {
+                console.log(facet);
                 facetString += tmpl.renderFacetTitle(facet);
-
                 var checkboxString = this.facets[facet].map(function(type){
                     var checked = this.params.includes(encodeURIComponent(type)) ? true : false;
                     return tmpl.renderCheckboxes(facet, type, checked);
@@ -137,6 +137,7 @@
             $("#filterForm").html(facetString);
         },
 		renderThumbs: function () {
+            this.models;
             var carsString = this.models.map(function(car){
                 return tmpl.displayThumb(car);
             });
