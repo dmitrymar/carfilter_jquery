@@ -1,4 +1,6 @@
 // Finish setting up this.deferredReset
+// Fix all issues with filteres
+// Add unit tests
 // Maybe find a library that will alternate between ajax request and localStorage
 // localStorage.getItem("todos-jquery").includes("ea7dbc7c-e236-4159-a5df-ce41e18e1d8a")
 // var sessionArray = JSON.stringify([{params: this.params || ""}]);
@@ -12,10 +14,10 @@
 // http://smalljs.org/client-side-routing/page/
 
 
-(function ($, app, Template) {
+(function ($, Template, Utils, Router) {
     "use strict";
 
-    var utils = new app.Utils();
+    var utils = new Utils();
     var tmpl = new Template();
 
     var App = {
@@ -47,14 +49,21 @@
                 console.log("deferredReset");
             }.bind(this));
 		},
+        setParams: function(settings) {
+            this.paramsArray = utils.createParamArray(settings);
+            this.params = utils.createParamString(this.paramsArray);
+        },
         changeView: function(e) {
             console.log("changeView")
-            var name = $(e.target).attr("name");
-            var value = $(e.target).val();
-            this.selectedFacet = name;
-            this.paramsArray = utils.createParamArray(name, value, this.paramsArray)
-            this.params = utils.createParamString(name, value, this.params, this.paramsArray);
-            this.requestData(e);
+            var settings = {
+                name: $(e.target).attr("name"),
+                value: $(e.target).val(),
+                params: this.params,
+                paramsArray: this.paramsArray
+            };
+            this.setParams(settings);
+            utils.setHash(this.paramsArray);
+            this.requestData();
             // render() is fired
             this.displayResetLink();
         },
@@ -67,27 +76,24 @@
         },
         route: function() {
             // if hash hasn't changed do this
-            this.requestData();
+            console.log("Start Routing");
+
 
             // if hash has changed change use director library for routing
-            console.log("route")
-            var author = function () { console.log("author"); };
-            var books = function () { console.log("books"); };
-            var viewBook = function (bookId) {
-              console.log("viewBook: bookId is populated: " + bookId);
-            };
+            var changeRoute = function (driveID) {
+                console.log("changeRoute");
+                //console.log("viewBook: bookId is populated: " + rangeId);
+                this.setParams();
+            }.bind(this);
 
             var routes = {
-              '/author': author,
-              '/books': [books, function() {
-                console.log("An inline route handler.");
-              }],
-              '/books/view/:bookId': viewBook
+              '/drive/:driveID': changeRoute
             };
 
             var router = Router(routes);
 
             router.init();
+            this.requestData();
         },
         render: function() {
             this.renderThumbs();
@@ -147,4 +153,4 @@
 	};
 
 	App.init();
-}(window.jQuery, app, Template));
+}(window.jQuery, Template, Utils, Router));

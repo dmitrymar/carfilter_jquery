@@ -1,31 +1,46 @@
-(function (window) {
-	'use strict';
-    function Utils() {
-		this.test = "test";
-	}
-    Utils.prototype.createParamArray = function (name, value, paramsArray) {
-        var paramObj = {"name": name, "value": value};
+class Utils {
 
-        if (JSON.stringify(paramsArray).includes(value)) {
-            paramsArray = paramsArray.filter(function(e){
-                return JSON.stringify(e) !== JSON.stringify(paramObj)
-            });
+    createParamArray (settings) {
+		var paramsArray;
+
+        if (!settings) {
+
+            paramsArray = [{"name":"drive","value":"All Wheel Drive"}];
+
         } else {
-            paramsArray.push(paramObj)
+
+            var paramObj = {"name": settings.name, "value": settings.value};
+            paramsArray = settings.paramsArray;
+            if (JSON.stringify(settings.paramsArray).includes(settings.value)) {
+                paramsArray = settings.paramsArray.filter(function(e){
+                    return JSON.stringify(e) !== JSON.stringify(paramObj);
+                });
+            } else {
+                paramsArray.push(paramObj);
+            }
+
         }
 
         return paramsArray;
-    };
+    }
 
-	Utils.prototype.createParamString = function (name, value, params, paramsArray) {
-	    var paramString = $.param(paramsArray);
-	    paramString = paramString.replace(/\+/g,'%20');
-	    return paramString;
-	};
+    createParamString (paramsArray) {
+        var paramString = $.param(paramsArray);
+        paramString = paramString.replace(/\+/g,'%20');
+        return paramString;
+    }
 
+    setHash(paramsArray) {
+        var url = "";
+        paramsArray.forEach(function(el) {
+            var hasName = url.includes(el.name);
+            var prefix = hasName ? "" : "/";
+            var value = hasName ? "|" + el.value : "/" + el.value;
+            var name = hasName ? "" : el.name;
 
+            url += prefix + name + value;
 
-    // Export to window
-	window.app = window.app || {};
-	window.app.Utils = Utils;
-})(window);
+        });
+        window.location.hash = url;
+    }
+}

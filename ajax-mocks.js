@@ -9,7 +9,7 @@ $.mockjax({
   response: function(settings) {
 
 		var query = decodeURIComponent(settings.data);
-		var models = $("body").data("models") || [];
+		var models = [];
 		var filteredFacets = {"range": [], "body": [], "drive": []};
 		var firstFacet = query.substring(0, 5);
 		var queryObj = deparam(query);
@@ -28,10 +28,22 @@ $.mockjax({
 				if (Object.keys(queryObj).length === 1) {
 					// if 1 facet is matched. E.g. SUV
 
-					// obj[key1] e.g. "0-100"
-					if (query.includes(obj[key])) {
-						return true;
+					if (Array.isArray(queryObj[key])) {
+						queryObj[key].forEach(function(el) {
+							if (el === obj[key]) {
+								counter++;
+								return true;
+							}
+						});
+						// exit main for loop
+						if (counter) {return true;}
+					} else {
+						// obj[key1] e.g. "0-100"
+						if (query.includes(obj[key])) {
+							return true;
+						}
 					}
+
 				} else if (Object.keys(queryObj).length === 2) {
 					// if 2 facets are matched // For ex. 200-400 miles, SUV
 
@@ -107,14 +119,8 @@ $.mockjax({
 		}
 
 		function getFilteredData() {
-			// if models is empty then use json.models to filter
-			if (models.length) {
-				models = models.filter(filterArray);
-			} else {
-				models.push.apply(models, json.models.filter(filterArray));
-				debugger
-			}
-			$("body").data("models", models);
+			models = json.models.filter(filterArray);
+
 			getFilteredFacets();
 			return {
 				"models": models, "facets": filteredFacets
