@@ -19,54 +19,6 @@ $.mockjax({
 			drive: ["range", "body"]
 		};
 
-		function filterArray (obj) {
-			var counter = 0;
-
-			for (var key in queryObj) {
-				// key e.g "range"
-
-				if (Object.keys(queryObj).length === 1) {
-					// if 1 facet is matched. E.g. SUV
-
-					if (Array.isArray(queryObj[key])) {
-						queryObj[key].forEach(function(el) {
-							if (el === obj[key]) {
-								counter++;
-								return true;
-							}
-						});
-						// exit main for loop
-						if (counter) {return true;}
-					} else {
-						// obj[key1] e.g. "0-100"
-						if (query.includes(obj[key])) {
-							return true;
-						}
-					}
-
-				} else if (Object.keys(queryObj).length === 2) {
-					// if 2 facets are matched // For ex. 200-400 miles, SUV
-
-						if (query.includes(obj[key])) {
-							for (var key2 in queryObj) {
-								if (key !== key2 && query.includes(obj[key2])) {
-									return true;
-								}
-							}
-						}
-				} else {
-					// if all facets are in query then check that each facet type is matched
-					// For ex. 200-400 miles, SUV, All wheel drive
-
-					if (query.includes(obj[key])) {
-						counter++;
-					}
-
-					if (counter === 3) {return true;}
-				}
-			} // end top for loop
-		}
-
 		function storeData(item) {
 			var facetType;
 			for (var key in json.facets) {
@@ -119,7 +71,7 @@ $.mockjax({
 		}
 
 		function getFilteredData() {
-			models = json.models.filter(filterArray);
+			models = _.filter(json.models, _.matches(queryObj));
 
 			getFilteredFacets();
 			return {

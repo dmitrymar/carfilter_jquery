@@ -1,11 +1,34 @@
 class Utils {
 
+    parseParms (hashurl) {
+        // pieces e.g. ["drive", "All%20Wheel%20Drive", "body", "SUV"]
+        var pieces = hashurl.split("/"), str = "";
+        console.log(pieces)
+        pieces.forEach(function(el, i) {
+          if((i % 2) === 0) {
+            str += '{"name":"' + el +'","'
+          } else {
+            str += 'value":"' + el + '"}';
+            str += (pieces.length - 1) === i ? "" : ",";
+
+          }
+        })
+        str = "[" + decodeURIComponent(str) + "]"
+        console.log(str)
+       return JSON.parse(str);
+
+    }
+
+
     createParamArray (settings) {
 		var paramsArray;
 
         if (!settings) {
-
-            paramsArray = [{"name":"drive","value":"All Wheel Drive"}];
+            console.log("No settings");
+            var hashurl = window.location.hash.substring(2);
+            console.log(this.parseParms(hashurl))
+            paramsArray = this.parseParms(hashurl);
+            //paramsArray = [{"name":"drive","value":"All Wheel Drive"}];
 
         } else {
 
@@ -30,7 +53,7 @@ class Utils {
         return paramString;
     }
 
-    setHash(paramsArray) {
+    buildRouteFragment (paramsArray) {
         var url = "";
         paramsArray.forEach(function(el) {
             var hasName = url.includes(el.name);
@@ -41,6 +64,6 @@ class Utils {
             url += prefix + name + value;
 
         });
-        window.location.hash = url;
+        return encodeURI(url);
     }
 }

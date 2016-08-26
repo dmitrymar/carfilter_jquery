@@ -19,6 +19,15 @@
 
     var utils = new Utils();
     var tmpl = new Template();
+    var routes = {
+    //   '/drive/:driveID': changeRoute,
+    //   '/drive/:driveID/body/:bodyID': changeRoute,
+      '/?((\w|.)*)': function() {
+          App.setParams();
+      }.bind(this)
+    };
+    var router = new Router(routes);
+
 
     var App = {
 		init: function () {
@@ -32,8 +41,10 @@
             this.paramsArray = [];
             this.models;
             this.params = "";
+            this.routeFragment = "";
             this.bindEvents();
-            this.route();
+            router.init();
+            this.requestData();
 		},
 		bindEvents: function () {
             $('#filterForm').on('change', '.toggle', this.changeView.bind(this));
@@ -52,6 +63,7 @@
         setParams: function(settings) {
             this.paramsArray = utils.createParamArray(settings);
             this.params = utils.createParamString(this.paramsArray);
+            this.routeFragment = utils.buildRouteFragment(this.paramsArray);
         },
         changeView: function(e) {
             console.log("changeView")
@@ -62,7 +74,7 @@
                 paramsArray: this.paramsArray
             };
             this.setParams(settings);
-            utils.setHash(this.paramsArray);
+            router.setRoute(this.routeFragment);
             this.requestData();
             // render() is fired
             this.displayResetLink();
@@ -73,27 +85,6 @@
             } else {
                 $(this.resetLink).addClass("hidden");
             }
-        },
-        route: function() {
-            // if hash hasn't changed do this
-            console.log("Start Routing");
-
-
-            // if hash has changed change use director library for routing
-            var changeRoute = function (driveID) {
-                console.log("changeRoute");
-                //console.log("viewBook: bookId is populated: " + rangeId);
-                this.setParams();
-            }.bind(this);
-
-            var routes = {
-              '/drive/:driveID': changeRoute
-            };
-
-            var router = Router(routes);
-
-            router.init();
-            this.requestData();
         },
         render: function() {
             this.renderThumbs();
@@ -114,7 +105,7 @@
         },
         requestData: function() {
             console.log("requestData")
-            var endpoint = "/api/models";
+            var endpoint = "http://www.edmunds.com/api/finder/v1?finderType=true&breadcrumbString=type:Electric&sortBy=baseMsrp:asc&offset=0&resultsPerPage=15";
             var $xhr = $.getJSON(endpoint, this.params);
             $.when($xhr)
             .done( function(response) {
