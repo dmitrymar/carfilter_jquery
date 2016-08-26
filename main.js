@@ -105,16 +105,26 @@
         },
         requestData: function() {
             console.log("requestData")
-            var endpoint = "http://www.edmunds.com/api/finder/v1?finderType=true&breadcrumbString=type:Electric&sortBy=baseMsrp:asc&offset=0&resultsPerPage=15";
-            var $xhr = $.getJSON(endpoint, this.params);
-            $.when($xhr)
-            .done( function(response) {
-
-                // store car models in mutable array. The values change depending on user selection
-                this.models = response.models;
-                this.facets = response.facets
-                this.deferredData.notify();
-            }.bind(this));
+            //var endpoint = "/api/models";
+            var endpoint = "//www.edmunds.com/api/finder/v1?finderType=true&breadcrumbString=type:Electric&sortBy=baseMsrp:asc&offset=0&resultsPerPage=15"
+            // var $xhr = $.getJSON(endpoint, this.params);
+            //
+            // $.when($xhr)
+            // .done( function(response) {
+            //
+            //     // store car models in mutable array. The values change depending on user selection
+            //     this.models = response.models;
+            //     this.facets = response.facets
+            //     this.deferredData.notify();
+            // }.bind(this));
+            $.ajax({
+url: endpoint,
+jsonp: "callback",
+datatype: "jsonp",
+success: function( data) {
+    console.log(data) ;
+   }
+});
         },
         renderFacets: function () {
             console.log("renderFacets");
