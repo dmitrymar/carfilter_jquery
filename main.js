@@ -14,7 +14,7 @@
 // http://smalljs.org/client-side-routing/page/
 
 
-(function ($, Template, Utils, Router) {
+(function ($, Template, Utils, Router, Cardata) {
     "use strict";
 
     var utils = new Utils();
@@ -27,43 +27,40 @@
       }.bind(this)
     };
     var router = new Router(routes);
-
+    var cardata = new Cardata();
 
     var App = {
 		init: function () {
 
             // Used to keep track of which filter is a proiority. Beginning elements in the array become a priority
             // E.g. ["drive", "body"]
-            this.facets = ["body", "drive"]; // immutable
             this.resetLink = $("#resetFilters").closest('p');
             this.deferredData = $.Deferred();
             this.deferredReset = $.Deferred();
+            this.constModels = cardata.zevs.models; // immutable
+            this.constFacets = cardata.zevs.facets; // immutable
+            this.models = cardata.zevs.models; // mutable
+            this.facets = cardata.zevs.facets; // mutable
             this.paramsArray = [];
-            this.models;
-            this.params = "";
+            this.params = [];
             this.routeFragment = "";
             this.bindEvents();
             router.init();
-            this.requestData();
+            this.render();
 		},
 		bindEvents: function () {
             $('#filterForm').on('change', '.toggle', this.changeView.bind(this));
             $('#resetFilters').on('click', this.reset.bind(this));
-
-            this.deferredData.progress(function () {
-                console.log("model changed");
-                console.log(this.facets);
-                this.render();
-            }.bind(this));
 
             this.deferredReset.progress(function () {
                 console.log("deferredReset");
             }.bind(this));
 		},
         setParams: function(settings) {
-            this.paramsArray = utils.createParamArray(settings);
-            this.params = utils.createParamString(this.paramsArray);
-            this.routeFragment = utils.buildRouteFragment(this.paramsArray);
+            //this.paramsArray = utils.createParamArray(settings);
+            //this.params = utils.createParamString(this.paramsArray);
+            //this.params = utils.createParamObj(settings);
+            //this.routeFragment = utils.buildRouteFragment(this.paramsArray);
         },
         changeView: function(e) {
             console.log("changeView")
@@ -73,9 +70,12 @@
                 params: this.params,
                 paramsArray: this.paramsArray
             };
-            this.setParams(settings);
-            router.setRoute(this.routeFragment);
-            this.requestData();
+            var checkedObj = {};
+            checkedObj[$(e.target).attr("name")] = $(e.target).val();
+            this.params.push(checkedObj);
+            //this.setParams(settings);
+            //router.setRoute(this.routeFragment);
+            this.filterData();
             // render() is fired
             this.displayResetLink();
         },
@@ -94,7 +94,7 @@
             console.log("reset clicked");
             event.preventDefault();
             this.params = "";
-            this.requestData();
+            this.filterData();
             this.resetFacets();
             $(this.resetLink).addClass("hidden");
         },
@@ -103,28 +103,46 @@
             $(".toggle").attr("checked", false);
             $(this.resetLink).addClass("hidden");
         },
-        requestData: function() {
-            console.log("requestData")
-            //var endpoint = "/api/models";
-            var endpoint = "//www.edmunds.com/api/finder/v1?finderType=true&breadcrumbString=type:Electric&sortBy=baseMsrp:asc&offset=0&resultsPerPage=15"
-            // var $xhr = $.getJSON(endpoint, this.params);
-            //
-            // $.when($xhr)
-            // .done( function(response) {
-            //
-            //     // store car models in mutable array. The values change depending on user selection
-            //     this.models = response.models;
-            //     this.facets = response.facets
-            //     this.deferredData.notify();
-            // }.bind(this));
-            $.ajax({
-url: endpoint,
-jsonp: "callback",
-datatype: "jsonp",
-success: function( data) {
-    console.log(data) ;
-   }
-});
+        filterData: function() {
+            console.log("filterData")
+            // use this.params to filter data
+                //  modify this.models and this.facets
+                // this.models = response.models;
+                // this.facets = response.facets
+
+                // [{"name":"drive","value":"All Wheel Drive"}];
+                var filteredModels = _.filter(this.models, function(o) {
+                    var checkTrue = false;
+                    this.params.some(function(el) {
+                        checkTrue = _.isMatch(o, el);
+                      }.bind(this));
+
+                    if (checkTrue) {return true;}
+                }.bind(this));
+
+                var filteredConstModels = _.filter(this.constModels, function(o) {
+                    var checkTrue = false;
+                    this.params.some(function(el) {
+                        checkTrue = _.isMatch(o, el);
+                      }.bind(this));
+
+                    if (checkTrue) {return true;}
+                }.bind(this));
+                // extend models array with new filtered models
+                //this.models = filteredModels;
+                // if both models and constModels are equal then assign filtred models to this models
+                if (_.eq(this.models, this.constModels)) {
+                    this.models = filteredModels;
+                } else {
+                    if (filteredModels.length > filteredConstModels.length) {
+                        this.models.push.apply(this.models, filteredConstModels);
+                    }
+                    this.models.push.apply(this.models, filteredConstModels);
+                    if (_.isMatch(this.models, filteredConstModels)) {
+                        this.models = _.intersection(this.models, filteredConstModels);
+                    }
+                }
+                this.render();
         },
         renderFacets: function () {
             console.log("renderFacets");
@@ -154,4 +172,4 @@ success: function( data) {
 	};
 
 	App.init();
-}(window.jQuery, Template, Utils, Router));
+}(window.jQuery, Template, Utils, Router, Cardata));

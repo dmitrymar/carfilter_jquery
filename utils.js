@@ -46,6 +46,11 @@ class Utils {
 
         return paramsArray;
     }
+    createParamObj (settings) {
+        var obj = {};
+        obj[settings.name] = settings.value;
+        return obj;
+    }
 
     createParamString (paramsArray) {
         var paramString = $.param(paramsArray);
